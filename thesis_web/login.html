@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Login</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('images/background.jpg') center / cover no-repeat fixed;
+        }
+
+        /* LOGIN CARD */
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            border-radius: 22px;
+
+            /* TRANSPARENT GLASS */
+            background: rgba(20, 30, 50, 0.55);
+            backdrop-filter: blur(18px) saturate(150%);
+            border: 1px solid rgba(110, 243, 255, 0.25);
+
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+        }
+
+        /* HEADER */
+        .login-header {
+            text-align: center;
+            padding: 28px 20px;
+            border-bottom: 1px solid rgba(110, 243, 255, 0.2);
+        }
+
+        .login-header h1 {
+            color: #6ef3ff;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .login-header span {
+            display: block;
+            width: 70px;
+            height: 4px;
+            margin: 12px auto 0;
+            border-radius: 4px;
+            background: linear-gradient(to right, #00f2ff, #7f5cff);
+        }
+
+        /* CONTENT */
+        .login-body {
+            padding: 35px;
+        }
+
+        .input-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b8e9ff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        input::placeholder {
+            color: #a9b4d6;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00f2ff;
+            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.35);
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-bottom: 30px;
+        }
+
+        .forgot-password a {
+            color: #6ef3ff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+
+        /* LOGIN BUTTON */
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #020617;
+
+            background: linear-gradient(135deg, #00f2ff, #7f5cff);
+            transition: 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 35px rgba(0, 242, 255, 0.5);
+        }
+
+        .login-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* FOOTER */
+        .signup-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(110, 243, 255, 0.2);
+            text-align: center;
+        }
+
+        .signup-section p {
+            color: #c7e9ff;
+            margin-bottom: 14px;
+        }
+
+        .signup-link {
+            display: inline-block;
+            padding: 10px 32px;
+            border-radius: 12px;
+            border: 2px solid #00f2ff;
+            color: #6ef3ff;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .signup-link:hover {
+            background: #00f2ff;
+            color: #020617;
+            box-shadow: 0 10px 25px rgba(0, 242, 255, 0.45);
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <!-- HEADER -->
+    <div class="login-header">
+        <h1>Login</h1>
+        <span></span>
+    </div>
+
+    <!-- BODY -->
+    <div class="login-body">
+        <div class="input-group">
+            <label>Username</label>
+            <input type="text" placeholder="Enter username">
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" placeholder="Enter password">
+        </div>
+
+        <div class="forgot-password">
+            <a href="#">Forgot password?</a>
+        </div>
+
+        <button class="login-btn">LOGIN</button>
+
+        <div class="signup-section">
+            <p>Don't have an account?</p>
+            <a href="#" class="signup-link">SIGN UP</a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
