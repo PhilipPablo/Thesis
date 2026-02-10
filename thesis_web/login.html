@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Login</title>
-
+    <title>Login | ADV-Attendify</title>
     <style>
         * {
             margin: 0;
@@ -18,25 +17,25 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background: url('images/background.jpg') center / cover no-repeat fixed;
+            background: 
+                url('images/csulogo.png') left 20px top 20px/61px 61px no-repeat,
+                url('images/coealogo.png') left 90px top 20px/61px 61px no-repeat,
+                url('images/icpeplogo.png') left 160px top 20px/61px 61px no-repeat,
+                url('images/background.jpg') center/cover no-repeat fixed;
         }
 
-        /* LOGIN CARD */
         .login-container {
             width: 100%;
             max-width: 420px;
             border-radius: 22px;
-
-            /* TRANSPARENT GLASS */
             background: rgba(20, 30, 50, 0.55);
             backdrop-filter: blur(18px) saturate(150%);
             border: 1px solid rgba(110, 243, 255, 0.25);
-
             box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* HEADER */
         .login-header {
             text-align: center;
             padding: 28px 20px;
@@ -58,13 +57,13 @@
             background: linear-gradient(to right, #00f2ff, #7f5cff);
         }
 
-        /* CONTENT */
         .login-body {
             padding: 35px;
         }
 
         .input-group {
             margin-bottom: 22px;
+            position: relative;
         }
 
         label {
@@ -97,9 +96,19 @@
             background: rgba(255, 255, 255, 0.14);
         }
 
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+        }
+
         .forgot-password {
             text-align: right;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .forgot-password a {
@@ -112,9 +121,8 @@
             text-decoration: underline;
         }
 
-        /* LOGIN BUTTON */
         .login-btn {
-            width: 100%;
+            width: 60%;
             padding: 16px;
             border-radius: 14px;
             border: none;
@@ -122,9 +130,10 @@
             font-weight: 700;
             cursor: pointer;
             color: #020617;
-
             background: linear-gradient(135deg, #00f2ff, #7f5cff);
             transition: 0.3s;
+            display: block;
+            margin: 0 auto 25px auto;
         }
 
         .login-btn:hover {
@@ -136,17 +145,17 @@
             transform: scale(0.97);
         }
 
-        /* FOOTER */
         .signup-section {
-            margin-top: 30px;
-            padding-top: 25px;
+            margin-top: 20px;
+            padding-top: 15px;
             border-top: 1px solid rgba(110, 243, 255, 0.2);
             text-align: center;
         }
 
         .signup-section p {
             color: #c7e9ff;
-            margin-bottom: 14px;
+            margin-bottom: 12px;
+            font-size: 14px;
         }
 
         .signup-link {
@@ -167,41 +176,62 @@
         }
     </style>
 </head>
-
 <body>
 
 <div class="login-container">
-
-    <!-- HEADER -->
     <div class="login-header">
         <h1>Login</h1>
         <span></span>
     </div>
 
-    <!-- BODY -->
     <div class="login-body">
         <div class="input-group">
             <label>Username</label>
-            <input type="text" placeholder="Enter username">
+            <input type="text" id="username" placeholder="Enter Username">
+            <div class="error-msg" id="username-error">Username is required</div>
         </div>
 
         <div class="input-group">
             <label>Password</label>
-            <input type="password" placeholder="Enter password">
+            <input type="password" id="password" placeholder="Enter Password">
+            <div class="error-msg" id="password-error">Password is required</div>
         </div>
 
         <div class="forgot-password">
-            <a href="#">Forgot password?</a>
+            <a href="forgot_password.html">Forgot Password?</a>
         </div>
 
-        <button class="login-btn">LOGIN</button>
+        <button class="login-btn" onclick="validateLogin()">LOGIN</button>
 
         <div class="signup-section">
             <p>Don't have an account?</p>
-            <a href="#" class="signup-link">SIGN UP</a>
+            <a href="signup.html" class="signup-link">SIGN UP</a>
         </div>
     </div>
 </div>
 
+<script>
+function validateLogin() {
+    const username = document.getElementById('username');
+    const password = document.getElementById('password');
+    let valid = true;
+
+    if(username.value.trim() === '') {
+        document.getElementById('username-error').style.display = 'block';
+        valid = false;
+    } else {
+        document.getElementById('username-error').style.display = 'none';
+    }
+
+    if(password.value.trim() === '') {
+        document.getElementById('password-error').style.display = 'block';
+        valid = false;
+    } else {
+        document.getElementById('password-error').style.display = 'none';
+    }
+
+    if(valid) alert('Login successful (simulation)');
+}
+</script>
 </body>
 </html>
