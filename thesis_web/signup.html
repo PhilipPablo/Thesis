@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | ADV-Attendify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: 
+                url('images/csulogo.png') left 20px top 20px/61px 61px no-repeat,
+                url('images/coealogo.png') left 90px top 20px/61px 61px no-repeat,
+                url('images/icpeplogo.png') left 160px top 20px/61px 61px no-repeat,
+                url('images/background.jpg') center/cover no-repeat fixed;
+        }
+
+        .signup-container {
+            width: 100%;
+            max-width: 420px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 22px;
+            background: rgba(20, 30, 50, 0.55);
+            backdrop-filter: blur(18px) saturate(150%);
+            border: 1px solid rgba(110, 243, 255, 0.25);
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .signup-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .signup-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .signup-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(#00f2ff, #7f5cff);
+            border-radius: 10px;
+            min-height: 40px;
+        }
+
+        .signup-header {
+            text-align: center;
+            padding: 28px 20px;
+            border-bottom: 1px solid rgba(110, 243, 255, 0.2);
+        }
+
+        .signup-header h1 {
+            color: #6ef3ff;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .signup-header span {
+            display: block;
+            width: 70px;
+            height: 4px;
+            margin: 12px auto 0;
+            border-radius: 4px;
+            background: linear-gradient(to right, #00f2ff, #7f5cff);
+        }
+
+        .signup-body {
+            padding: 35px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #b8e9ff;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        input::placeholder {
+            color: #a9b4d6;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #00f2ff;
+            box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.35);
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .error-msg {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+        }
+
+        .signup-btn {
+            width: 60%;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #020617;
+            background: linear-gradient(135deg, #00f2ff, #7f5cff);
+            transition: 0.3s;
+            display: block;
+            margin: 15px auto 20px auto;
+        }
+
+        .signup-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 35px rgba(0, 242, 255, 0.5);
+        }
+
+        .signup-btn:active {
+            transform: scale(0.97);
+        }
+
+        .login-link {
+            text-align: center;
+            font-size: 14px;
+            color: #c7e9ff;
+            margin-bottom: 20px;
+        }
+
+        .login-link a {
+            color: #6ef3ff;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="signup-container">
+    <div class="signup-header">
+        <h1>Create Account</h1>
+        <span></span>
+    </div>
+
+    <div class="signup-body">
+        <div class="input-group">
+            <label>Firstname</label>
+            <input type="text" id="firstname" placeholder="Enter Firstname">
+            <div class="error-msg" id="firstname-error">Firstname is required</div>
+        </div>
+
+        <div class="input-group">
+            <label>Lastname</label>
+            <input type="text" id="lastname" placeholder="Enter Lastname">
+            <div class="error-msg" id="lastname-error">Lastname is required</div>
+        </div>
+
+        <div class="input-group">
+            <label>ID Number</label>
+            <input type="text" id="idnumber" placeholder="Enter ID Number">
+            <div class="error-msg" id="idnumber-error">ID Number is required</div>
+        </div>
+
+        <div class="input-group">
+            <label>Username</label>
+            <input type="text" id="username" placeholder="Enter Username">
+            <div class="error-msg" id="username-error">Username is required</div>
+        </div>
+
+        <div class="input-group">
+            <label>Email</label>
+            <input type="email" id="email" placeholder="Enter Email">
+            <div class="error-msg" id="email-error">Email is required</div>
+        </div>
+
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="Enter Password">
+            <div class="error-msg" id="password-error">Password is required</div>
+        </div>
+
+        <div class="input-group">
+            <label>Confirm Password</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm Password">
+            <div class="error-msg" id="confirmPassword-error">Confirm Password is required</div>
+        </div>
+
+        <button class="signup-btn" onclick="validateSignup()">Sign Up</button>
+
+        <div class="login-link">
+            Already have an account? <a href="login.html">Login</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function validateSignup() {
+    const fields = [
+        {id:'firstname', name:'Firstname'},
+        {id:'lastname', name:'Lastname'},
+        {id:'idnumber', name:'ID Number'},
+        {id:'username', name:'Username'},
+        {id:'email', name:'Email'},
+        {id:'password', name:'Password'},
+        {id:'confirmPassword', name:'Confirm Password'}
+    ];
+    let valid = true;
+
+    for(let field of fields){
+        const value = document.getElementById(field.id).value.trim();
+        const errorDiv = document.getElementById(`${field.id}-error`);
+        if(value === ''){
+            errorDiv.style.display = 'block';
+            valid = false;
+        } else {
+            errorDiv.style.display = 'none';
+        }
+    }
+
+    if(valid) alert('Sign Up successful (simulation)');
+}
+</script>
+
+</body>
+</html>
