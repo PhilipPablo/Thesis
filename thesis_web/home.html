@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Home | ADV-Attendify</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ================= BACKGROUND ================= */
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:url("images/backgroundhome.png") center/cover no-repeat fixed;
+}
+
+/* ================= NAVBAR ================= */
+nav{
+    position:fixed;
+    top:0;
+    width:100%;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(0,0,0,0.25);
+    backdrop-filter:blur(8px);
+    z-index:1001;
+}
+
+.menu-btn{
+    font-size:28px;
+    background:none;
+    border:none;
+    color:#6fe3ff;
+    cursor:pointer;
+}
+
+/* ================= HERO ================= */
+.hero{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding-top:90px;
+}
+
+/* ================= GLASS MAIN PANEL ================= */
+.main-panel{
+    width:92%;
+    max-width:1200px;
+    padding:45px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(14px);
+    border-radius:26px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+
+/* ================= PROFILE ICON ================= */
+.profile-wrapper{
+    position:relative;
+}
+
+.profile{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    overflow:hidden;
+    cursor:pointer;
+    border:2px solid #6fe3ff;
+}
+
+.profile img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* ================= PROFILE DROPDOWN ================= */
+.profile-menu{
+    position:absolute;
+    top:55px;
+    right:0;
+    background:#0b2a3a;
+    border-radius:12px;
+    padding:10px 0;
+    min-width:170px;
+    opacity:0;
+    pointer-events:none;
+    transition:0.25s;
+}
+
+.profile-menu.active{
+    opacity:1;
+    pointer-events:all;
+}
+
+.profile-menu a{
+    display:block;
+    padding:12px 20px;
+    color:#dffaff;
+    text-decoration:none;
+}
+
+.profile-menu a:hover{
+    background:#1ea7d7;
+    color:#00141c;
+}
+
+/* ================= STUDENT CARD ================= */
+.student-card{
+    display:flex;
+    gap:45px;
+    align-items:center;
+    color:#00141c;
+}
+
+/* LEFT */
+.student-left{
+    width:300px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:25px;
+}
+
+.student-photo{
+    width:170px;
+    height:170px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.name-pill{
+    background:#dffaff;
+    padding:12px 45px;
+    border-radius:30px;
+    font-weight:600;
+}
+
+.esign{
+    text-align:center;
+    font-weight:600;
+}
+
+.esign .line{
+    width:140px;
+    height:3px;
+    background:#00141c;
+    margin-top:8px;
+}
+
+/* DIVIDER */
+.divider{
+    width:3px;
+    height:380px;
+    background:#00141c;
+    opacity:0.5;
+}
+
+/* RIGHT */
+.student-right{
+    flex:1;
+}
+
+.school-header{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.logos{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:10px;
+}
+
+.logos img{
+    width:45px;
+}
+
+.course{
+    margin:2% 0 3%;
+}
+
+/* TEXTAREA RESPONSIVE */
+.about-box{
+    background:#dffaff;
+    width:100%;
+    max-width:800px;
+    min-height:210px;
+    border-radius:22px;
+    padding:25px;
+    font-size:1rem;
+    font-style:italic;
+    color:#444;
+    resize:none;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width:1100px){
+    .student-card{
+        flex-direction:column;
+        text-align:center;
+    }
+    .divider{ display:none; }
+    .student-left,
+    .student-right{ width:100%; }
+}
+
+@media (max-width:600px){
+    .main-panel{ padding:25px; }
+    .about-box{ min-height:160px; padding:18px; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== LOAD SIDEBAR HERE ===== -->
+<div id="sidebarContainer"></div>
+
+<!-- Navbar -->
+<nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <div class="profile-wrapper">
+        <div class="profile" onclick="toggleProfileMenu()">
+            <img src="images/profile.png" id="navProfileImage">
+        </div>
+
+        <div id="profileMenu" class="profile-menu">
+            <a href="edit_profile.html">Edit Profile</a>
+            <a href="#">Settings</a>
+            <a href="login.html">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- STUDENT PANEL -->
+<section class="hero">
+    <div class="main-panel student-card">
+
+        <div class="student-left">
+            <img src="images/profile2.png" id="mainProfileImage" class="student-photo">
+            <div class="name-pill" id="fullNameDisplay">Full Name</div>
+
+            <div class="esign">
+                E-Signature
+                <div class="line"></div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="student-right">
+
+            <div class="school-header">
+                <div class="logos">
+                    <img src="images/csulogo.png">
+                    <img src="images/coealogo.png">
+                    <img src="images/cpelogo.png">
+                </div>
+
+                <h2>Cagayan State University - Carig Campus</h2>
+                <p>College of Engineering and Architecture</p>
+            </div>
+
+            <p class="course">
+                Bachelor of Science in Computer Engineering<br>
+                Year - Section
+            </p>
+
+            <textarea id="aboutInput" class="about-box"
+                placeholder="About me... (Press Enter to save)"></textarea>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    /* ===== load sidebar component ===== */
+    fetch("sidebar.html")
+    .then(r => r.text())
+    .then(html => {
+        document.getElementById("sidebarContainer").innerHTML = html;
+        // Initialize sidebar after it's loaded
+        initializeSidebar();
+    });
+
+    function initializeSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    
+    if (sidebar && overlay) {
+        window.toggleMenu = function(){
+            sidebar.classList.toggle("active");
+            overlay.classList.toggle("active");
+        };
+        
+        overlay.onclick = toggleMenu;
+    }
+}
+
+// Load profile data from localStorage
+document.addEventListener('DOMContentLoaded', function() {
+    // Load full name
+    const savedFullName = localStorage.getItem('userFullName');
+    if (savedFullName) {
+        document.getElementById('fullNameDisplay').textContent = savedFullName;
+    } else {
+        // Try to construct from first and last name
+        const firstName = localStorage.getItem('profileFirstName') || '';
+        const lastName = localStorage.getItem('profileLastName') || '';
+        if (firstName || lastName) {
+            document.getElementById('fullNameDisplay').textContent = `${firstName} ${lastName}`.trim();
+        }
+    }
+    
+    // Load profile images
+    const savedImage = localStorage.getItem('profileImage');
+    if (savedImage) {
+        document.getElementById('mainProfileImage').src = savedImage;
+        document.getElementById('navProfileImage').src = savedImage;
+    }
+    
+    // Load about me text
+    const savedAbout = localStorage.getItem('aboutText');
+    if (savedAbout) {
+        document.getElementById('aboutInput').value = savedAbout;
+    }
+});
+    
+/* ===== about me save ===== */
+const aboutInput = document.getElementById("aboutInput");
+
+aboutInput.value = localStorage.getItem("aboutText") || "";
+
+aboutInput.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+        e.preventDefault();
+        localStorage.setItem("aboutText", aboutInput.value);
+        aboutInput.blur();
+        alert("Saved!");
+    }
+});
+
+/* profile dropdown */
+function toggleProfileMenu(){
+    const profileMenu = document.getElementById("profileMenu");
+    profileMenu.classList.toggle("active");
+}
+
+document.addEventListener("click", function(e){
+    const profile = document.querySelector(".profile");
+    const menu = document.getElementById("profileMenu");
+    if(!profile.contains(e.target) && !menu.contains(e.target)){
+        menu.classList.remove("active");
+    }
+});
+
+// Listen for storage changes to update profile in real-time
+window.addEventListener('storage', function(e) {
+    if (e.key === 'profileImage') {
+        document.getElementById('mainProfileImage').src = e.newValue;
+        document.getElementById('navProfileImage').src = e.newValue;
+    }
+    if (e.key === 'userFullName') {
+        document.getElementById('fullNameDisplay').textContent = e.newValue;
+    }
+    if (e.key === 'aboutText') {
+        document.getElementById('aboutInput').value = e.newValue;
+    }
+});
+</script>
+
+</body>
+</html>
