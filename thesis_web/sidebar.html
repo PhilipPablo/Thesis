@@ -189,9 +189,6 @@
         transform: rotate(90deg);
     }
     
- 
-
-    
     .toggle-switch {
         position: relative;
         width: 50px;
@@ -252,9 +249,9 @@
     </div>
     
     <div class="sidebar-links">
-        <!-- Home link with conditional navigation -->
-        <a href="homepage.html" id="homeLink" class="sidebar-link">Profile</a>
-        <a href="Photos.html" class="sidebar-link">Submit Photos</a>
+        <!-- Fixed: changed from homepage.html to home.html -->
+        <a href="home.html" id="homeLink" class="sidebar-link">Profile</a>
+        <a href="photos.html" class="sidebar-link">Submit Photos</a>
         <a href="projects.html" class="sidebar-link">Subjects</a>
         <a href="services.html" class="sidebar-link">Services</a>
         <a href="contact.html" class="sidebar-link">Contact</a>
@@ -302,7 +299,7 @@ document.addEventListener('keydown', function(e) {
 // Initialize page highlighting - THIS WILL WORK NOW because the page actually reloads
 function highlightCurrentPage() {
     const currentPath = window.location.pathname;
-    const currentPage = currentPath.split('/').pop() || 'homepage.html';
+    const currentPage = currentPath.split('/').pop() || 'home.html';
     const links = document.querySelectorAll('.sidebar-link');
     
     links.forEach(link => {
@@ -322,8 +319,8 @@ function highlightCurrentPage() {
         }
         
         // Special case for homepage
-        if ((currentPageNormalized === '' || currentPageNormalized === 'index' || currentPageNormalized === 'homepage') && 
-            (linkPageNormalized === 'homepage' || linkPageNormalized === 'index' || linkPageNormalized === '')) {
+        if ((currentPageNormalized === '' || currentPageNormalized === 'index' || currentPageNormalized === 'home') && 
+            (linkPageNormalized === 'home' || linkPageNormalized === 'index' || linkPageNormalized === '')) {
             link.classList.add('active');
         }
     });
@@ -331,12 +328,6 @@ function highlightCurrentPage() {
 
 // Run highlighting when page loads
 document.addEventListener('DOMContentLoaded', highlightCurrentPage);
-// Toggle sidebar function
-window.toggleMenu = function(){
-    sidebar.classList.toggle("active");
-    overlay.classList.toggle("active");
-    document.body.style.overflow = sidebar.classList.contains("active") ? "hidden" : "auto";
-};
 
 // Close sidebar function
 function closeSidebar() {
