@@ -28,7 +28,6 @@
             width: 100%;
             max-width: 420px;
             max-height: 90vh;
-            overflow-y: auto;
             border-radius: 22px;
             background: rgba(20, 30, 50, 0.55);
             backdrop-filter: blur(18px) saturate(150%);
@@ -38,16 +37,14 @@
             flex-direction: column;
         }
 
+        /* Remove scrollbar from container */
+        .signup-container {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;      /* Firefox */
+        }
+        
         .signup-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .signup-container::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .signup-container::-webkit-scrollbar-thumb {
-            background: linear-gradient(#00f2ff, #7f5cff);
-            border-radius: 10px;
-            min-height: 40px;
+            display: none;  /* Chrome, Safari and Opera */
         }
 
         .signup-header {
@@ -73,6 +70,18 @@
 
         .signup-body {
             padding: 35px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        /* Remove scrollbar from body */
+        .signup-body {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;      /* Firefox */
+        }
+        
+        .signup-body::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari and Opera */
         }
 
         .input-group {
@@ -108,6 +117,59 @@
             border-color: #00f2ff;
             box-shadow: 0 0 0 3px rgba(0, 242, 255, 0.35);
             background: rgba(255, 255, 255, 0.14);
+        }
+
+        /* User Type Selection Styles */
+        .user-type-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .user-type-option {
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .user-type-radio {
+            display: none;
+        }
+
+        .user-type-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 10px;
+            border-radius: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.08);
+            color: #a9b4d6;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-height: 90px;
+        }
+
+        .user-type-radio:checked + .user-type-label {
+            border-color: #00f2ff;
+            background: rgba(0, 242, 255, 0.15);
+            color: #6ef3ff;
+            box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.35);
+        }
+
+        .user-type-label:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #c7e9ff;
+        }
+
+        /* Icon styling for user types - smaller and centered */
+        .user-type-icon {
+            display: block;
+            width: 32px;
+            height: 32px;
+            margin-bottom: 8px;
+            object-fit: contain;
         }
 
         .error-msg {
@@ -171,6 +233,30 @@
     </div>
 
     <div class="signup-body">
+        <!-- User Type Selection (Student/Professor) -->
+        <div class="input-group">
+            <label>I am a:</label>
+
+            <div class="user-type-container">
+                <div class="user-type-option">
+                    <input type="radio" id="student" name="userType" value="student" class="user-type-radio" checked>
+                    <label for="student" class="user-type-label">
+                        <img src="images/student.png" class="user-type-icon" alt="Student Icon">
+                        Student
+                    </label>
+                </div>
+
+                <div class="user-type-option">
+                    <input type="radio" id="professor" name="userType" value="professor" class="user-type-radio">
+                    <label for="professor" class="user-type-label">
+                        <img src="images/professor.png" class="user-type-icon" alt="Professor Icon">
+                        Professor
+                    </label>
+                </div>
+            </div>
+            <div class="error-msg" id="userType-error">Please select an account type</div>
+        </div>
+
         <div class="input-group">
             <label>Firstname</label>
             <input type="text" id="firstname" placeholder="Enter Firstname">
@@ -184,7 +270,7 @@
         </div>
 
         <div class="input-group">
-            <label>ID Number</label>
+            <label id="id-label">ID Number</label>
             <input type="text" id="idnumber" placeholder="Enter ID Number">
             <div class="error-msg" id="idnumber-error">ID Number is required</div>
         </div>
@@ -222,6 +308,35 @@
 </div>
 
 <script>
+// Function to update the label based on selected user type
+function updateIDLabel() {
+    const userType = document.querySelector('input[name="userType"]:checked');
+    const idLabel = document.getElementById('id-label');
+    const idInput = document.getElementById('idnumber');
+    const idError = document.getElementById('idnumber-error');
+    
+    if (userType && userType.value === 'professor') {
+        idLabel.textContent = 'Code';
+        idInput.placeholder = 'Enter Code';
+        idError.textContent = 'Code is required';
+    } else {
+        idLabel.textContent = 'ID Number';
+        idInput.placeholder = 'Enter ID Number';
+        idError.textContent = 'ID Number is required';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    updateIDLabel();
+    
+    // Add event listeners to user type radio buttons
+    const userTypeRadios = document.querySelectorAll('input[name="userType"]');
+    userTypeRadios.forEach(radio => {
+        radio.addEventListener('change', updateIDLabel);
+    });
+});
+
 function validateSignup() {
     const fields = [
         {id:'firstname', name:'Firstname'},
@@ -232,12 +347,34 @@ function validateSignup() {
         {id:'password', name:'Password'},
         {id:'confirmPassword', name:'Confirm Password'}
     ];
+    
     let valid = true;
 
+    // Check if user type is selected
+    const userType = document.querySelector('input[name="userType"]:checked');
+    const userTypeError = document.getElementById('userType-error');
+    
+    if (!userType) {
+        userTypeError.style.display = 'block';
+        valid = false;
+    } else {
+        userTypeError.style.display = 'none';
+    }
+
+    // Validate all other fields
     for(let field of fields){
         const value = document.getElementById(field.id).value.trim();
         const errorDiv = document.getElementById(`${field.id}-error`);
+        
+        // Get the correct field name for the error message
+        let fieldName = field.name;
+        if (field.id === 'idnumber') {
+            // Use the current label text as the field name
+            fieldName = document.getElementById('id-label').textContent;
+        }
+        
         if(value === ''){
+            errorDiv.textContent = `${fieldName} is required`;
             errorDiv.style.display = 'block';
             valid = false;
         } else {
@@ -245,8 +382,52 @@ function validateSignup() {
         }
     }
 
-    if(valid) alert('Sign Up successful (simulation)');
+    // Check if passwords match
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const confirmPasswordError = document.getElementById('confirmPassword-error');
+    
+    if (password !== confirmPassword && password !== '' && confirmPassword !== '') {
+        confirmPasswordError.textContent = 'Passwords do not match';
+        confirmPasswordError.style.display = 'block';
+        valid = false;
+    }
+
+    if(valid) {
+        const selectedUserType = userType.value;
+        const idFieldName = document.getElementById('id-label').textContent;
+        
+        alert(`Sign Up successful (simulation)\nAccount type: ${selectedUserType.charAt(0).toUpperCase() + selectedUserType.slice(1)}\n${idFieldName}: ${document.getElementById('idnumber').value}`);
+        
+        // In a real application, you would submit the form here
+        // Example: collect all form data
+        const formData = {
+            userType: selectedUserType,
+            firstname: document.getElementById('firstname').value,
+            lastname: document.getElementById('lastname').value,
+            idnumber: document.getElementById('idnumber').value,
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value
+        };
+        console.log('Form data:', formData);
+    }
 }
+
+// Optional: Add real-time password matching validation
+document.getElementById('confirmPassword').addEventListener('input', function() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = this.value;
+    const errorDiv = document.getElementById('confirmPassword-error');
+    
+    if (password !== confirmPassword && password !== '' && confirmPassword !== '') {
+        errorDiv.textContent = 'Passwords do not match';
+        errorDiv.style.display = 'block';
+    } else if (confirmPassword === '') {
+        errorDiv.textContent = 'Confirm Password is required';
+    } else {
+        errorDiv.style.display = 'none';
+    }
+});
 </script>
 
 </body>
