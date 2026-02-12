@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Attendance Monitor | ADV-Attendify</title>
+
+  <style>
+    /* ===== ORIGINAL STYLES (fully preserved) ===== */
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      overflow-x:hidden;
+      background:url("images/backgroundhome.png") center/cover no-repeat fixed;
+    }
+
+    nav{
+      position:fixed;
+      top:0;
+      width:100%;
+      padding:20px 40px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:rgba(0,0,0,0.25);
+      backdrop-filter:blur(8px);
+      z-index:1001;
+    }
+
+    .menu-btn{
+      font-size:28px;
+      background:none;
+      border:none;
+      color:#6fe3ff;
+      cursor:pointer;
+    }
+
+    .profile{
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      overflow:hidden;
+      cursor:pointer;
+      border:2px solid #6fe3ff;
+    }
+
+    .profile img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .profile-menu{
+      position:absolute;
+      top:55px;
+      right:0;
+      background:#0b2a3a;
+      border-radius:12px;
+      padding:10px 0;
+      min-width:170px;
+      opacity:0;
+      pointer-events:none;
+      transition:0.25s;
+    }
+
+    .profile-menu.active{
+      opacity:1;
+      pointer-events:all;
+    }
+
+    .profile-menu a{
+      display:block;
+      padding:12px 20px;
+      color:#dffaff;
+      text-decoration:none;
+    }
+
+    .profile-menu a:hover{
+      background:#1ea7d7;
+      color:#00141c;
+    }
+
+    /* ===== ATTENDANCE DISPLAY – ONLY LOGS + DATE MONITOR ===== */
+    .attendance-container {
+      margin-top: 100px;
+      margin-left: 250px;      /* space for sidebar */
+      padding: 30px 40px;
+      transition: margin-left 0.3s;
+      max-width: 1200px;
+    }
+
+    @media (max-width: 768px) {
+      .attendance-container {
+        margin-left: 20px;
+        padding: 20px;
+      }
+    }
+
+    .attendance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      color: #0a8baf;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .attendance-header h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: #0a8baf;
+    }
+
+    .live-date {
+      background: rgba(10, 40, 55, 0.7);
+      backdrop-filter: blur(4px);
+      padding: 12px 24px;
+      border-radius: 50px;
+      border: 1px solid #3fc3e0;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #e6fbff;
+      box-shadow: 0 0 15px rgba(110, 227, 255, 0.2);
+    }
+
+    /* NO attendance card with time in/out – removed as requested */
+    
+    .recent-title {
+      margin: 0 0 15px 0;
+      font-size: 1.5rem;
+      color: #0a8baf;
+      border-bottom: 1px solid #53c8e0;
+      padding-bottom: 8px;
+      display: inline-block;
+    }
+
+    .attendance-log {
+      background: rgba(6, 28, 37, 0.7);
+      backdrop-filter: blur(6px);
+      border-radius: 24px;
+      padding: 10px;
+      border: 1px solid #2d99ae;
+    }
+
+    .log-row {
+      display: flex;
+      padding: 16px 22px;
+      border-bottom: 1px solid rgba(111, 227, 255, 0.15);
+      color: #dbffff;
+      font-size: 1.05rem;
+      align-items: center;
+    }
+
+    .log-row:last-child {
+      border-bottom: none;
+    }
+
+    .log-subject {
+      width: 180px;
+      font-weight: 600;
+      color: #a8ecff;
+    }
+
+    .log-date {
+      width: 130px;
+    }
+
+    .log-timein, .log-timeout {
+      width: 110px;
+      font-family: monospace;
+    }
+
+    .log-status {
+      width: 100px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      background: #0d5e6b;
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .badge-success {
+      background: #008b74;
+    }
+
+    .profile-wrapper {
+      position: relative;
+    }
+
+    #sidebarContainer {
+      position: relative;
+      z-index: 1002;
+    }
+
+    /* Hardware source note – optional, pure visual */
+    .hardware-badge {
+      display: inline-block;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(2px);
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: #b6f2ff;
+      border: 1px dashed #5fdaff;
+      margin-top: 20px;
+    }
+    /* ===== END OF STYLES – NO TIME IN/OUT PANEL ===== */
+  </style>
+</head>
+<body>
+
+  <!-- sidebar injected dynamically -->
+  <div id="sidebarContainer"></div>
+
+  <nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="profile-wrapper">
+      <div class="profile" onclick="toggleProfileMenu()">
+        <img src="images/profile.png" alt="profile" id="navProfileImage">
+      </div>
+      <div id="profileMenu" class="profile-menu">
+        <a href="edit_profile.html">Edit Profile</a>
+        <a href="#">Settings</a>
+        <a href="login.html">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== ATTENDANCE MONITOR: ONLY DATE/TIME HEADER + DATABASE LOGS ===== -->
+  <!-- UPPER TIME IN/TIME OUT REMOVED COMPLETELY, ONLY DATA LOGS REMAIN -->
+  <div class="attendance-container">
+    
+    <!-- Header with live date/time monitor (kept) -->
+    <div class="attendance-header">
+      <h1> Attendance Records</h1>
+      <div class="live-date" id="liveDateDisplay">
+        <!-- dynamic date/time filled by JS -->
+      </div>
+    </div>
+
+    <!-- NO attendance card / time boxes / subject chip – removed per request -->
+    
+    <!-- Recent attendance log: data from database / hardware -->
+    <h3 class="recent-title"> Database Logs</h3>
+    <div class="attendance-log">
+      
+      <!-- ALL DATA STATIC – REPRESENTS DATABASE/HARDWARE RECORDS -->
+      <div class="log-row">
+        <span class="log-subject">Computer Networks</span>
+        <span class="log-date">2025-04-09</span>
+        <span class="log-timein">08:53 AM</span>
+        <span class="log-timeout">05:12 PM</span>
+        <span class="log-status"><span class="badge badge-success">Present</span></span>
+      </div>
+      
+      <div class="log-row">
+        <span class="log-subject">Operating Systems</span>
+        <span class="log-date">2025-04-08</span>
+        <span class="log-timein">09:02 AM</span>
+        <span class="log-timeout">04:58 PM</span>
+        <span class="log-status"><span class="badge badge-success">Present</span></span>
+      </div>
+      
+      <div class="log-row">
+        <span class="log-subject">Database Systems</span>
+        <span class="log-date">2025-04-07</span>
+        <span class="log-timein">08:47 AM</span>
+        <span class="log-timeout">05:20 PM</span>
+        <span class="log-status"><span class="badge badge-success">Present</span></span>
+      </div>
+      
+      <div class="log-row">
+        <span class="log-subject">Computer Networks</span>
+        <span class="log-date">2025-04-06</span>
+        <span class="log-timein">08:55 AM</span>
+        <span class="log-timeout">05:08 PM</span>
+        <span class="log-status"><span class="badge badge-success">Present</span></span>
+      </div>
+      
+      <div class="log-row">
+        <span class="log-subject">Cybersecurity</span>
+        <span class="log-date">2025-04-05</span>
+        <span class="log-timein">09:10 AM</span>
+        <span class="log-timeout">04:45 PM</span>
+        <span class="log-status"><span class="badge badge-success">Present</span></span>
+      </div>
+
+      <div class="log-row">
+        <span class="log-subject">Web Development</span>
+        <span class="log-date">2025-04-04</span>
+        <span class="log-timein">08:59 AM</span>
+        <span class="log-timeout">05:15 PM</span>
+        <span class="log-status"><span class="badge badge-success">Present</span></span>
+      </div>
+      
+    </div> <!-- end attendance-log -->
+    
+    <!-- Optional hardware source note – purely informational -->
+    <div class="hardware-badge">
+       datas retrieved from the hardware · database records
+    </div>
+
+  </div> <!-- end attendance-container -->
+
+  <script>
+    // ===== ORIGINAL SCRIPT (PRESERVED, NO ATTENDANCE INTERACTIONS) =====
+    // fetch sidebar, initialize toggle etc. – untouched, only profile menu works.
+    
+    fetch("sidebar.html")
+      .then(r => r.text())
+      .then(html => {
+        document.getElementById("sidebarContainer").innerHTML = html;
+        initializeSidebar();
+      })
+      .catch(err => {
+        console.warn("sidebar.html not found – using fallback.");
+        let dummySidebar = document.createElement('div');
+        dummySidebar.id = 'sidebar';
+        dummySidebar.style.display = 'none';
+        document.getElementById("sidebarContainer").appendChild(dummySidebar);
+        let dummyOverlay = document.createElement('div');
+        dummyOverlay.id = 'overlay';
+        document.body.appendChild(dummyOverlay);
+        initializeSidebar();
+      });
+
+    function initializeSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      
+      if (sidebar && overlay) {
+        window.toggleMenu = function(){
+          sidebar.classList.toggle("active");
+          overlay.classList.toggle("active");
+        };
+        overlay.onclick = toggleMenu;
+      } else {
+        window.toggleMenu = function() { console.log("sidebar not loaded"); };
+      }
+    }
+
+    // Original profile functions – untouched
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedImage = localStorage.getItem('profileImage');
+      if (savedImage) {
+        const navImg = document.getElementById('navProfileImage');
+        if (navImg) navImg.src = savedImage;
+      }
+    });
+
+    function toggleProfileMenu(){
+      const profileMenu = document.getElementById("profileMenu");
+      profileMenu.classList.toggle("active");
+    }
+
+    document.addEventListener("click", function(e){
+      const profile = document.querySelector(".profile");
+      const menu = document.getElementById("profileMenu");
+      if(profile && menu && !profile.contains(e.target) && !menu.contains(e.target)){
+        menu.classList.remove("active");
+      }
+    });
+
+    // Listen for storage changes (profile image)
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'profileImage') {
+        const navImg = document.getElementById('navProfileImage');
+        if (navImg) navImg.src = e.newValue;
+      }
+    });
+
+    // ===== ONLY LIVE DATE DISPLAY (HEADER CLOCK) – NO ATTENDANCE FUNCTIONS =====
+    (function() {
+      function updateLiveDate() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formatted = now.toLocaleDateString('en-US', options);
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const liveEl = document.getElementById('liveDateDisplay');
+        if (liveEl) {
+          liveEl.innerHTML = `${formatted} &nbsp; <span style="background:rgba(0,0,0,0.2); padding:5px 10px; border-radius:30px;">${timeStr}</span>`;
+        }
+      }
+      updateLiveDate();
+      setInterval(updateLiveDate, 1000); // only updates the header clock
+    })();
+
+    // NO time in/out, NO subject switch, NO interactive attendance elements.
+    // Only static logs representing database/hardware data.
+  </script>
+
+  <!-- overlay for sidebar (original) -->
+  <div id="overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(3px); z-index:999; opacity:0; pointer-events:none; transition:0.25s;" onclick="toggleMenu()"></div>
+  <script>
+    // ensure overlay exists
+    const overlayEl = document.getElementById('overlay');
+  </script>
+</body>
+</html>
