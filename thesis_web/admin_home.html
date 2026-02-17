@@ -45,6 +45,26 @@ nav{
     cursor:pointer;
 }
 
+/* ================= HERO ================= */
+.hero{
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding-top:90px;
+}
+
+/* ================= GLASS MAIN PANEL ================= */
+.main-panel{
+    width:92%;
+    max-width:1200px;
+    padding:45px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(14px);
+    border-radius:26px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+
 /* ================= PROFILE ICON ================= */
 .profile-wrapper{
     position:relative;
@@ -98,6 +118,82 @@ nav{
     color:#00141c;
 }
 
+/* ================= STUDENT CARD ================= */
+.admin-card{
+    display:flex;
+    gap:45px;
+    align-items:center;
+    color:#00141c;
+}
+
+/* LEFT */
+.admin-left{
+    width:300px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:25px;
+}
+
+.admin-photo{
+    width:170px;
+    height:170px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.name-pill{
+    background:#dffaff;
+    padding:12px 45px;
+    border-radius:30px;
+    font-weight:600;
+}
+
+.esign{
+    text-align:center;
+    font-weight:600;
+}
+
+.esign .line{
+    width:140px;
+    height:3px;
+    background:#00141c;
+    margin-top:8px;
+}
+
+/* DIVIDER */
+.divider{
+    width:3px;
+    height:380px;
+    background:#00141c;
+    opacity:0.5;
+}
+
+/* RIGHT */
+.admin-right{
+    flex:1;
+}
+
+.school-header{
+    text-align:center;
+    margin-bottom:10px;
+}
+
+.logos{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:10px;
+}
+
+.logos img{
+    width:45px;
+}
+
+.course{
+    margin:2% 0 3%;
+}
+
 /* Custom SweetAlert2 styling */
 .swal2-popup {
     background: #0b2a3a !important;
@@ -126,6 +222,22 @@ nav{
     border: 2px solid #6ef3ff !important;
     border-radius: 12px !important;
 }
+
+@media (max-width:1100px){
+    .admin-card{
+        flex-direction:column;
+        text-align:center;
+    }
+    .divider{ display:none; }
+    .admin-left,
+    .admin-right{ width:100%; }
+}
+
+    #sidebarContainer {
+      position: relative;
+      z-index: 1002;
+    }
+
 </style>
 </head>
 
@@ -149,6 +261,39 @@ nav{
         </div>
     </div>
 </nav>
+
+<!-- STUDENT PANEL -->
+<section class="hero">
+    <div class="main-panel admin-card">
+
+        <div class="admin-left">
+            <img src="images/profile2.png" id="mainProfileImage" class="admin-photo">
+            <div class="name-pill" id="fullNameDisplay">Full Name</div>
+
+            <div class="esign">
+                E-Signature
+                <div class="line"></div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="admin-right">
+
+            <div class="school-header">
+                <div class="logos">
+                    <img src="images/csulogo.png">
+                    <img src="images/coealogo.png">
+                    <img src="images/cpelogo.png">
+                </div>
+
+                <h2>Cagayan State University - Carig Campus</h2>
+                <p>College of Engineering and Architecture</p>
+            </div>
+
+        </div>
+    </div>
+</section>
 
 <!-- SweetAlert2 JS -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
