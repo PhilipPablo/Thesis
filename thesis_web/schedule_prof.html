@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Create Schedule | ADV-Attendify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: url("images/backgroundhome.png") center/cover no-repeat fixed;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+            z-index: 1001;
+        }
+
+        .menu-btn {
+            font-size: 28px;
+            background: none;
+            border: none;
+            color: #6fe3ff;
+            cursor: pointer;
+        }
+
+        .profile-wrapper {
+            position: relative;
+        }
+
+        .profile {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid #6fe3ff;
+        }
+
+        .profile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-menu {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: #0b2a3a;
+            border-radius: 12px;
+            padding: 10px 0;
+            min-width: 170px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.25s;
+            z-index: 1002;
+        }
+
+        .profile-menu.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .profile-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #dffaff;
+            text-decoration: none;
+        }
+
+        .profile-menu a:hover {
+            background: #1ea7d7;
+            color: #00141c;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 260px;
+            height: 100%;
+            background: rgba(10, 30, 40, 0.95);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid #2c5a6e;
+            padding: 30px 20px;
+            transition: left 0.3s ease;
+            z-index: 2000;
+            color: #e0f0f5;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar .close-btn {
+            background: none;
+            border: none;
+            color: #6fe3ff;
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 25px 0;
+        }
+
+        .sidebar ul li a {
+            color: #dffaff;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.2s;
+        }
+
+        .sidebar ul li a:hover {
+            color: #6fe3ff;
+            transform: translateX(5px);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(2px);
+            z-index: 1500;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-top: 100px;
+            padding: 20px 30px;
+            margin-left: 0;
+            transition: margin-left 0.3s;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: #6fe3ff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 2.2rem;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .schedule-container {
+            background: rgba(8, 25, 35, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid #1ea7d7;
+            border-radius: 32px;
+            padding: 30px;
+            color: #f0faff;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.6);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #b3e4ff;
+            margin-bottom: 8px;
+            font-weight: 400;
+            font-size: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            background: #1c3f4f;
+            border: 1px solid #3b7a94;
+            border-radius: 40px;
+            padding: 14px 20px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #6fe3ff;
+        }
+
+        .form-control option {
+            background: #1c3f4f;
+            color: white;
+        }
+
+        .time-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .time-col {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .btn-primary {
+            background: #1ea7d7;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #00141c;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 8px 16px rgba(0,40,60,0.4);
+            border: 1px solid #6fe3ff;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .btn-primary:hover {
+            background: #6fe3ff;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid #6fe3ff;
+            padding: 8px 20px;
+            border-radius: 30px;
+            color: #dffaff;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-secondary:hover {
+            background: #1ea7d7;
+            color: #00141c;
+        }
+
+        .schedules-list {
+            margin-top: 40px;
+        }
+
+        .schedules-list h2 {
+            color: #6fe3ff;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 400;
+            border-bottom: 1px dashed #2c5a6e;
+            padding-bottom: 10px;
+        }
+
+        .schedule-card {
+            background: rgba(10, 30, 40, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid #2c5a6e;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 15px;
+            color: #e6f7ff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .schedule-info h3 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .schedule-info p {
+            color: #9bbaca;
+            font-size: 0.95rem;
+        }
+
+        .schedule-time {
+            background: #1c3f4f;
+            padding: 8px 16px;
+            border-radius: 30px;
+            border: 1px solid #3b7a94;
+            font-size: 0.95rem;
+        }
+
+        .delete-schedule {
+            color: #ff9f9f;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px 10px;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .delete-schedule:hover {
+            background: rgba(220, 70, 70, 0.3);
+        }
+
+        .placeholder-text {
+            color: #799eb0;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+            border-radius: 24px;
+        }
+
+        /* Random subject chips for visual aid */
+        .subject-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .subject-chip {
+            background: #154250;
+            border-radius: 30px;
+            padding: 5px 15px;
+            border: 1px solid #3f92b0;
+            color: #d7f0fa;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+<div id="sidebarContainer"></div>
+
+<nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="profile-wrapper">
+        <div class="profile" onclick="toggleProfileMenu()">
+            <img src="images/profile.png" id="navProfileImage" alt="profile">
+        </div>
+        <div id="profileMenu" class="profile-menu">
+            <a href="edit_profile.html">Edit Profile</a>
+            <a href="#">Settings</a>
+            <a href="login.html">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="mainContent">
+    <div class="page-header">
+        <h1>Create Schedule</h1>
+    </div>
+
+    <div class="schedule-container">
+        <form id="scheduleForm" onsubmit="event.preventDefault(); createSchedule();">
+            <div class="form-group">
+                <label>Select Subject</label>
+                <select id="subjectSelect" class="form-control" required>
+                    <option value="">-- Choose a subject --</option>
+                </select>
+            </div>
+
+            <div class="time-row">
+                <div class="time-col">
+                    <div class="form-group">
+                        <label>Start Time</label>
+                        <input type="time" id="startTime" class="form-control" required>
+                    </div>
+                </div>
+                <div class="time-col">
+                    <div class="form-group">
+                        <label>End Time</label>
+                        <input type="time" id="endTime" class="form-control" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="scheduleDate" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Create Schedule</button>
+        </form>
+    </div>
+
+    <!-- List of created schedules -->
+    <div class="schedules-list">
+        <h2>Current Schedules</h2>
+        <div id="schedulesContainer">
+            <!-- Schedules will be displayed here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- PROFILE MENU ----------
+    function toggleProfileMenu() {
+        document.getElementById('profileMenu').classList.toggle('active');
+    }
+    window.toggleProfileMenu = toggleProfileMenu;
+
+    // ---------- SIDEBAR ----------
+    fetch('sidebar_prof.html')
+        .then(r => r.text())
+        .then(html => {
+            document.getElementById('sidebarContainer').innerHTML = html;
+            initializeSidebar();
+        })
+        .catch(error => {
+            console.error('Error loading sidebar, using fallback');
+            const fallbackSidebar = `
+                <div class="sidebar" id="sidebar">
+                    <button class="close-btn" onclick="toggleMenu()">✕</button>
+                    <ul>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Subjects</a></li>
+                        <li><a href="#">Students</a></li>
+                        <li><a href="#">Settings</a></li>
+                    </ul>
+                </div>
+                <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+            `;
+            document.getElementById('sidebarContainer').innerHTML = fallbackSidebar;
+            initializeSidebar();
+        });
+
+    function initializeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        if (sidebar && overlay) {
+            window.toggleMenu = function() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            };
+        } else {
+            window.toggleMenu = function() { console.warn('sidebar not ready'); };
+        }
+    }
+
+    // ---------- RANDOM SUBJECTS FOR TESTING (simulating database) ----------
+    const testSubjects = [
+        { id: 'subj1', name: 'Advanced Mathematics', code: 'MATH401' },
+        { id: 'subj2', name: 'Data Structures', code: 'CSE202' },
+        { id: 'subj3', name: 'Digital Electronics', code: 'ECE310' },
+        { id: 'subj4', name: 'Algorithms', code: 'CSE301' },
+        { id: 'subj5', name: 'Physics 101', code: 'PHY101' },
+        { id: 'subj6', name: 'Chemistry Lab', code: 'CHEM202' },
+        { id: 'subj7', name: 'English Literature', code: 'ENG150' },
+        { id: 'subj8', name: 'History 201', code: 'HIST201' }
+    ];
+
+    // Load schedules from localStorage or initialize empty array
+    let schedules = JSON.parse(localStorage.getItem('prof_schedules')) || [];
+
+    // Populate subject dropdown
+    function populateSubjectDropdown() {
+        const select = document.getElementById('subjectSelect');
+        select.innerHTML = '<option value="">-- Choose a subject --</option>';
+        
+        testSubjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject.id;
+            option.textContent = `${subject.name} (${subject.code})`;
+            select.appendChild(option);
+        });
+    }
+
+    // Format time for display (add AM/PM if needed)
+    function formatTime(timeString) {
+        // timeString is in HH:MM format from input type="time"
+        const [hours, minutes] = timeString.split(':');
+        const hour = parseInt(hours);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const hour12 = hour % 12 || 12;
+        return `${hour12}:${minutes} ${ampm}`;
+    }
+
+    // Create new schedule
+    function createSchedule() {
+        const subjectId = document.getElementById('subjectSelect').value;
+        const startTime = document.getElementById('startTime').value;
+        const endTime = document.getElementById('endTime').value;
+        const date = document.getElementById('scheduleDate').value;
+
+        // Validation
+        if (!subjectId || !startTime || !endTime || !date) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        // Find subject details
+        const subject = testSubjects.find(s => s.id === subjectId);
+        if (!subject) return;
+
+        // Create schedule object
+        const newSchedule = {
+            id: 'sch_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            subjectId: subject.id,
+            subjectName: subject.name,
+            subjectCode: subject.code,
+            startTime: startTime,
+            endTime: endTime,
+            date: date,
+            createdAt: new Date().toISOString()
+        };
+
+        schedules.push(newSchedule);
+        localStorage.setItem('prof_schedules', JSON.stringify(schedules));
+
+        // Clear form
+        document.getElementById('scheduleForm').reset();
+
+        // Refresh display
+        displaySchedules();
+    }
+
+    // Display all schedules
+    function displaySchedules() {
+        const container = document.getElementById('schedulesContainer');
+        
+        if (schedules.length === 0) {
+            container.innerHTML = '<div class="placeholder-text">No schedules created yet. Create your first schedule above.</div>';
+            return;
+        }
+
+        // Sort schedules by date (most recent first)
+        const sortedSchedules = [...schedules].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        container.innerHTML = '';
+        sortedSchedules.forEach(schedule => {
+            const scheduleCard = document.createElement('div');
+            scheduleCard.className = 'schedule-card';
+
+            // Format date for display
+            const scheduleDate = new Date(schedule.date);
+            const formattedDate = scheduleDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            const startFormatted = formatTime(schedule.startTime);
+            const endFormatted = formatTime(schedule.endTime);
+
+            scheduleCard.innerHTML = `
+                <div class="schedule-info">
+                    <h3>${schedule.subjectName} (${schedule.subjectCode})</h3>
+                    <p>${formattedDate}</p>
+                </div>
+                <div class="schedule-time">
+                    ${startFormatted} - ${endFormatted}
+                </div>
+                <div class="delete-schedule" onclick="deleteSchedule('${schedule.id}')" title="Delete schedule">✕</div>
+            `;
+
+            container.appendChild(scheduleCard);
+        });
+    }
+
+    // Delete a schedule
+    function deleteSchedule(scheduleId) {
+        if (confirm('Are you sure you want to delete this schedule?')) {
+            schedules = schedules.filter(s => s.id !== scheduleId);
+            localStorage.setItem('prof_schedules', JSON.stringify(schedules));
+            displaySchedules();
+        }
+    }
+
+    // Set default date to today
+    function setDefaultDate() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('scheduleDate').value = today;
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        populateSubjectDropdown();
+        setDefaultDate();
+        displaySchedules();
+
+        // Close profile menu on outside click
+        window.addEventListener('click', function(e) {
+            const profileMenu = document.getElementById('profileMenu');
+            const profilePic = document.querySelector('.profile');
+            if (!profilePic?.contains(e.target) && !profileMenu?.contains(e.target)) {
+                profileMenu?.classList.remove('active');
+            }
+        });
+    });
+
+    // Expose delete function globally
+    window.deleteSchedule = deleteSchedule;
+</script>
+
+</body>
+</html>
