@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Home | ADV-Attendify</title>
+
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ================= BACKGROUND ================= */
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:url("images/backgroundhome.png") center/cover no-repeat fixed;
+}
+
+/* ================= NAVBAR ================= */
+nav{
+    position:fixed;
+    top:0;
+    width:100%;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(0,0,0,0.25);
+    backdrop-filter:blur(8px);
+    z-index:1001;
+}
+
+.menu-btn{
+    font-size:28px;
+    background:none;
+    border:none;
+    color:#6fe3ff;
+    cursor:pointer;
+}
+
+/* ================= PROFILE ICON ================= */
+.profile-wrapper{
+    position:relative;
+}
+
+.profile{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    overflow:hidden;
+    cursor:pointer;
+    border:2px solid #6fe3ff;
+}
+
+.profile img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* ================= PROFILE DROPDOWN ================= */
+.profile-menu{
+    position:absolute;
+    top:55px;
+    right:0;
+    background:#0b2a3a;
+    border-radius:12px;
+    padding:10px 0;
+    min-width:170px;
+    opacity:0;
+    pointer-events:none;
+    transition:0.25s;
+    z-index:1002;
+}
+
+.profile-menu.active{
+    opacity:1;
+    pointer-events:all;
+}
+
+.profile-menu a{
+    display:block;
+    padding:12px 20px;
+    color:#dffaff;
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.profile-menu a:hover{
+    background:#1ea7d7;
+    color:#00141c;
+}
+
+/* Custom SweetAlert2 styling */
+.swal2-popup {
+    background: #0b2a3a !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(110, 243, 255, 0.25) !important;
+}
+
+.swal2-title {
+    color: #6ef3ff !important;
+}
+
+.swal2-html-container {
+    color: #dffaff !important;
+}
+
+.swal2-confirm {
+    background: linear-gradient(135deg, #00f2ff, #7f5cff) !important;
+    color: #020617 !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+}
+
+.swal2-cancel {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #dffaff !important;
+    border: 2px solid #6ef3ff !important;
+    border-radius: 12px !important;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== LOAD SIDEBAR HERE ===== -->
+<div id="sidebarContainer"></div>
+
+<!-- Navbar -->
+<nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <div class="profile-wrapper">
+        <div class="profile" onclick="toggleProfileMenu()">
+            <img src="images/profile.png" id="navProfileImage">
+        </div>
+
+        <div id="profileMenu" class="profile-menu">
+            <a href="admin_profile.html">Edit Profile</a>
+            <a onclick="confirmLogout()">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    /* ===== load sidebar component ===== */
+    fetch("admin_sidebar.html")
+    .then(r => r.text())
+    .then(html => {
+        document.getElementById("sidebarContainer").innerHTML = html;
+        // Initialize sidebar after it's loaded
+        initializeSidebar();
+    });
+
+    function initializeSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    
+    if (sidebar && overlay) {
+        window.toggleMenu = function(){
+            sidebar.classList.toggle("active");
+            overlay.classList.toggle("active");
+        };
+        
+        overlay.onclick = toggleMenu;
+    }
+}
+
+// Logout confirmation function
+function confirmLogout() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You will be logged out of your account!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#00f2ff',
+        cancelButtonColor: '#ff6b6b',
+        confirmButtonText: 'Yes, logout',
+        cancelButtonText: 'Cancel',
+        background: '#0b2a3a',
+        color: '#dffaff'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Clear all user data from localStorage
+            localStorage.clear();
+            
+            Swal.fire({
+                title: 'Logged Out!',
+                text: 'You have been successfully logged out.',
+                icon: 'success',
+                confirmButtonColor: '#00f2ff',
+                background: '#0b2a3a',
+                color: '#dffaff'
+            }).then(() => {
+                // Redirect to login page
+                window.location.href = 'login.html';
+            });
+        }
+    });
+}
+
+// Load profile data from localStorage
+document.addEventListener('DOMContentLoaded', function() {
+    // Load full name
+    const savedFullName = localStorage.getItem('userFullName');
+    if (savedFullName) {
+        document.getElementById('fullNameDisplay').textContent = savedFullName;
+    } else {
+        // Try to construct from first and last name
+        const firstName = localStorage.getItem('profileFirstName') || '';
+        const lastName = localStorage.getItem('profileLastName') || '';
+        if (firstName || lastName) {
+            document.getElementById('fullNameDisplay').textContent = `${firstName} ${lastName}`.trim();
+        }
+    }
+    
+    // Load profile images
+    const savedImage = localStorage.getItem('profileImage');
+    if (savedImage) {
+        document.getElementById('mainProfileImage').src = savedImage;
+        document.getElementById('navProfileImage').src = savedImage;
+    }
+    
+    // Load about me text
+    const savedAbout = localStorage.getItem('aboutText');
+    if (savedAbout) {
+        document.getElementById('aboutInput').value = savedAbout;
+    }
+});
+
+/* profile dropdown */
+function toggleProfileMenu(){
+    const profileMenu = document.getElementById("profileMenu");
+    profileMenu.classList.toggle("active");
+}
+
+document.addEventListener("click", function(e){
+    const profile = document.querySelector(".profile");
+    const menu = document.getElementById("profileMenu");
+    if(!profile.contains(e.target) && !menu.contains(e.target)){
+        menu.classList.remove("active");
+    }
+});
+
+// Listen for storage changes to update profile in real-time
+window.addEventListener('storage', function(e) {
+    if (e.key === 'profileImage') {
+        document.getElementById('mainProfileImage').src = e.newValue;
+        document.getElementById('navProfileImage').src = e.newValue;
+    }
+    if (e.key === 'userFullName') {
+        document.getElementById('fullNameDisplay').textContent = e.newValue;
+    }
+    if (e.key === 'aboutText') {
+        document.getElementById('aboutInput').value = e.newValue;
+    }
+});
+</script>
+
+</body>
+</html>
