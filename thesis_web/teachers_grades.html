@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Professor Grades | ADV-Attendify</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: url("images/backgroundhome.png") center/cover no-repeat fixed;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+            z-index: 1001;
+        }
+
+        .menu-btn {
+            font-size: 28px;
+            background: none;
+            border: none;
+            color: #6fe3ff;
+            cursor: pointer;
+        }
+
+        .profile-wrapper {
+            position: relative;
+        }
+
+        .profile {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid #6fe3ff;
+        }
+
+        .profile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-menu {
+            position: absolute;
+            top: 55px;
+            right: 0;
+            background: #0b2a3a;
+            border-radius: 12px;
+            padding: 10px 0;
+            min-width: 170px;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.25s;
+            z-index: 1002;
+        }
+
+        .profile-menu.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .profile-menu a {
+            display: block;
+            padding: 12px 20px;
+            color: #dffaff;
+            text-decoration: none;
+        }
+
+        .profile-menu a:hover {
+            background: #1ea7d7;
+            color: #00141c;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            position: fixed;
+            left: -280px;
+            top: 0;
+            width: 260px;
+            height: 100%;
+            background: rgba(10, 30, 40, 0.95);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid #2c5a6e;
+            padding: 30px 20px;
+            transition: left 0.3s ease;
+            z-index: 2000;
+            color: #e0f0f5;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar .close-btn {
+            background: none;
+            border: none;
+            color: #6fe3ff;
+            font-size: 28px;
+            cursor: pointer;
+            margin-bottom: 30px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin: 25px 0;
+        }
+
+        .sidebar ul li a {
+            color: #dffaff;
+            text-decoration: none;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: 0.2s;
+        }
+
+        .sidebar ul li a:hover {
+            color: #6fe3ff;
+            transform: translateX(5px);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(2px);
+            z-index: 1500;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Main content */
+        .main-content {
+            margin-top: 100px;
+            padding: 20px 30px;
+            margin-left: 0;
+            transition: margin-left 0.3s;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .section-header h1 {
+            color: #6fe3ff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 2.2rem;
+            font-weight: 400;
+            letter-spacing: 1px;
+        }
+
+        .search-box {
+            background: rgba(10, 30, 40, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid #2c5a6e;
+            border-radius: 40px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 300px;
+            max-width: 100%;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: #e6f7ff;
+            font-size: 1rem;
+            outline: none;
+            width: 100%;
+        }
+
+        .search-box input::placeholder {
+            color: #9bbaca;
+        }
+
+        .search-box span {
+            color: #6fe3ff;
+            font-size: 1.2rem;
+        }
+
+        /* Subject cards grid */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .subject-card {
+            background: rgba(10, 30, 40, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid #2c5a6e;
+            border-radius: 24px;
+            padding: 25px 20px;
+            color: #e6f7ff;
+            box-shadow: 0 10px 20px rgba(0, 20, 30, 0.5);
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .subject-card:hover {
+            border-color: #6fe3ff;
+            background: rgba(20, 50, 65, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .subject-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .subject-card p {
+            opacity: 0.8;
+            font-size: 0.95rem;
+        }
+
+        /* Grades panel */
+        .grades-panel {
+            background: rgba(8, 25, 35, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid #1ea7d7;
+            border-radius: 32px;
+            padding: 30px;
+            margin-top: 40px;
+            color: #f0faff;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.6);
+        }
+
+        .grades-panel h2 {
+            color: #6fe3ff;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            font-weight: 400;
+            border-bottom: 1px dashed #2c5a6e;
+            padding-bottom: 10px;
+        }
+
+        .filter-bar {
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .student-search {
+            background: #1c3f4f;
+            border: 1px solid #3b7a94;
+            border-radius: 40px;
+            padding: 10px 20px;
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+            width: 280px;
+        }
+
+        .student-search:focus {
+            border-color: #6fe3ff;
+        }
+
+        .grades-table-container {
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        .grades-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .grades-table th {
+            background: #1c3f4f;
+            color: #b3e4ff;
+            font-weight: 500;
+            padding: 15px 10px;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .grades-table td {
+            padding: 15px 10px;
+            border-bottom: 1px solid #2e5f72;
+            color: #d7f0fa;
+        }
+
+        .grades-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .grade-input {
+            background: #1c3f4f;
+            border: 1px solid #3b7a94;
+            border-radius: 40px;
+            padding: 8px 15px;
+            color: white;
+            font-size: 0.95rem;
+            outline: none;
+            width: 100px;
+            transition: 0.2s;
+        }
+
+        .grade-input:focus {
+            border-color: #6fe3ff;
+            background: #1e4557;
+        }
+
+        .grade-input.saved {
+            border-color: #4ca07a;
+            background: #1e4a3a;
+        }
+
+        .student-name {
+            font-weight: 500;
+        }
+
+        .student-year-section {
+            color: #9bbaca;
+            font-size: 0.9rem;
+        }
+
+        .placeholder-text {
+            color: #799eb0;
+            font-style: italic;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .no-results {
+            color: #ffb3b3;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div id="sidebarContainer"></div>
+
+<nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="profile-wrapper">
+        <div class="profile" onclick="toggleProfileMenu()">
+            <img src="images/profile.png" id="navProfileImage" alt="profile">
+        </div>
+        <div id="profileMenu" class="profile-menu">
+            <a href="teachers_profile.html">Edit Profile</a>
+            <a href="#">Settings</a>
+            <a href="login.html">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main-content" id="mainContent">
+    <div class="section-header">
+        <h1>Grade Records</h1>
+        <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="subjectSearch" placeholder="Search subjects..." onkeyup="filterSubjects()">
+        </div>
+    </div>
+
+    <div id="subjectsContainer" class="subjects-grid"></div>
+
+    <!-- Grades panel (shown when subject clicked) -->
+    <div id="gradesPanel" class="grades-panel" style="display: none;">
+        <h2 id="selectedSubjectTitle">Subject name - Grades</h2>
+        
+        <div class="filter-bar">
+            <input type="text" id="studentNameSearch" class="student-search" placeholder="Search students by name..." onkeyup="filterStudents()">
+        </div>
+        
+        <div id="gradesContent">
+            <!-- Will be populated with student grades table -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- PROFILE MENU ----------
+    function toggleProfileMenu() {
+        document.getElementById('profileMenu').classList.toggle('active');
+    }
+    window.toggleProfileMenu = toggleProfileMenu;
+
+    // ---------- SIDEBAR ----------
+    fetch('teachers_sidebar.html')
+        .then(r => r.text())
+        .then(html => {
+            document.getElementById('sidebarContainer').innerHTML = html;
+            initializeSidebar();
+        })
+        .catch(error => {
+            console.error('Error loading sidebar, using fallback');
+            const fallbackSidebar = `
+                <div class="sidebar" id="sidebar">
+                    <button class="close-btn" onclick="toggleMenu()">✕</button>
+                    <ul>
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Subjects</a></li>
+                        <li><a href="#">Students</a></li>
+                        <li><a href="#">Settings</a></li>
+                    </ul>
+                </div>
+                <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+            `;
+            document.getElementById('sidebarContainer').innerHTML = fallbackSidebar;
+            initializeSidebar();
+        });
+
+    function initializeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        if (sidebar && overlay) {
+            window.toggleMenu = function() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            };
+        } else {
+            window.toggleMenu = function() { console.warn('sidebar not ready'); };
+        }
+    }
+
+    // ---------- DATA ----------
+    // Static subjects (no create/delete)
+    const subjects = [
+        { 
+            id: 's1', 
+            name: 'Advanced Mathematics', 
+            code: 'MAT401', 
+            students: [
+                { id: 'st1', grade: '' },
+                { id: 'st2', grade: '' },
+                { id: 'st6', grade: '' },
+                { id: 'st9', grade: '' }
+            ] 
+        },
+        { 
+            id: 's2', 
+            name: 'Data Structures', 
+            code: 'CSE202', 
+            students: [
+                { id: 'st3', grade: '' },
+                { id: 'st4', grade: '' },
+                { id: 'st7', grade: '' },
+                { id: 'st10', grade: '' }
+            ] 
+        },
+        { 
+            id: 's3', 
+            name: 'Digital Electronics', 
+            code: 'ECE310', 
+            students: [
+                { id: 'st5', grade: '' },
+                { id: 'st8', grade: '' }
+            ] 
+        },
+        { 
+            id: 's4', 
+            name: 'Algorithms', 
+            code: 'CSE301', 
+            students: [
+                { id: 'st1', grade: '' },
+                { id: 'st3', grade: '' },
+                { id: 'st5', grade: '' },
+                { id: 'st7', grade: '' },
+                { id: 'st9', grade: '' }
+            ] 
+        },
+    ];
+
+    // Student database with details
+    const studentDB = [
+        { id: 'st1', name: 'Alice Chen', year: '2', section: 'A' },
+        { id: 'st2', name: 'Bob Miller', year: '3', section: 'B' },
+        { id: 'st3', name: 'Charlie Rose', year: '1', section: 'C' },
+        { id: 'st4', name: 'Diana Prince', year: '4', section: 'A' },
+        { id: 'st5', name: 'Ethan Hunt', year: '2', section: 'B' },
+        { id: 'st6', name: 'Fiona Glen', year: '3', section: 'C' },
+        { id: 'st7', name: 'George King', year: '1', section: 'D' },
+        { id: 'st8', name: 'Hannah Lee', year: '4', section: 'B' },
+        { id: 'st9', name: 'Ian Wright', year: '2', section: 'A' },
+        { id: 'st10', name: 'Jane Eyre', year: '3', section: 'D' },
+    ];
+
+    let currentSubjectId = null;
+    let currentStudentFilter = '';
+
+    // No persistence needed - static data
+    function renderSubjectCards() {
+        const container = document.getElementById('subjectsContainer');
+        const filterText = document.getElementById('subjectSearch')?.value.toLowerCase() || '';
+        
+        const filteredSubjects = subjects.filter(sub => 
+            sub.name.toLowerCase().includes(filterText) || 
+            (sub.code && sub.code.toLowerCase().includes(filterText))
+        );
+        
+        container.innerHTML = '';
+        
+        if (filteredSubjects.length === 0) {
+            container.innerHTML = '<div class="placeholder-text">No subjects match your search.</div>';
+            return;
+        }
+        
+        filteredSubjects.forEach(sub => {
+            const card = document.createElement('div');
+            card.className = 'subject-card';
+            card.innerHTML = `
+                <h3>${sub.name}</h3>
+                <p>${sub.code || ''}  • ${sub.students.length} students</p>
+            `;
+            
+            card.addEventListener('click', () => openSubjectGrades(sub.id));
+            container.appendChild(card);
+        });
+    }
+
+    // Subject search function
+    window.filterSubjects = function() {
+        renderSubjectCards();
+    };
+
+    // Open grades view for subject
+    function openSubjectGrades(subjectId) {
+        const subject = subjects.find(s => s.id === subjectId);
+        if (!subject) return;
+        
+        currentSubjectId = subjectId;
+        const panel = document.getElementById('gradesPanel');
+        panel.style.display = 'block';
+        document.getElementById('selectedSubjectTitle').innerText = `${subject.name} (${subject.code || 'no code'}) - Grades`;
+        
+        // Clear student search when opening new subject
+        document.getElementById('studentNameSearch').value = '';
+        currentStudentFilter = '';
+        
+        renderGradesTable(subject);
+    }
+
+    // Student search function
+    window.filterStudents = function() {
+        if (!currentSubjectId) return;
+        const subject = subjects.find(s => s.id === currentSubjectId);
+        if (subject) {
+            renderGradesTable(subject);
+        }
+    };
+
+    // Render grades table with editable inputs (no action column)
+    function renderGradesTable(subject) {
+        const container = document.getElementById('gradesContent');
+        const searchTerm = document.getElementById('studentNameSearch').value.toLowerCase().trim();
+        
+        if (!subject.students || subject.students.length === 0) {
+            container.innerHTML = '<div class="placeholder-text">No students enrolled in this subject.</div>';
+            return;
+        }
+
+        // Get all enrolled students with details and filter by name
+        let enrolledStudents = subject.students
+            .map(enrollment => {
+                const student = studentDB.find(s => s.id === enrollment.id);
+                return student ? { ...student, grade: enrollment.grade || '' } : null;
+            })
+            .filter(s => s !== null);
+        
+        // Apply name filter
+        if (searchTerm) {
+            enrolledStudents = enrolledStudents.filter(s => 
+                s.name.toLowerCase().includes(searchTerm)
+            );
+        }
+
+        if (enrolledStudents.length === 0) {
+            container.innerHTML = '<div class="no-results">No students match your search.</div>';
+            return;
+        }
+
+        let tableHTML = `
+            <div class="grades-table-container">
+                <table class="grades-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Year & Section</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        enrolledStudents.forEach(student => {
+            tableHTML += `
+                <tr data-student-id="${student.id}">
+                    <td class="student-name">${student.name}</td>
+                    <td class="student-year-section">Year ${student.year} · Section ${student.section}</td>
+                    <td>
+                        <input type="text" class="grade-input" value="${student.grade}" 
+                               placeholder="Enter grade" data-student-id="${student.id}"
+                               onkeypress="handleGradeKeyPress(event, '${subject.id}', '${student.id}')">
+                    </td>
+                </tr>
+            `;
+        });
+
+        tableHTML += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        container.innerHTML = tableHTML;
+        
+        // Focus styling for saved feedback will be handled by save function
+    }
+
+    // Handle Enter key press on grade input
+    function handleGradeKeyPress(event, subjectId, studentId) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            const input = event.target;
+            saveGrade(subjectId, studentId, input);
+        }
+    }
+
+    // Save grade for a student
+    function saveGrade(subjectId, studentId, inputElement) {
+        const subject = subjects.find(s => s.id === subjectId);
+        if (!subject) return;
+
+        const newGrade = inputElement.value.trim();
+
+        // Find the enrollment and update grade
+        const enrollment = subject.students.find(e => e.id === studentId);
+        if (enrollment) {
+            enrollment.grade = newGrade;
+            
+            // Visual feedback
+            inputElement.classList.add('saved');
+            setTimeout(() => {
+                inputElement.classList.remove('saved');
+            }, 500);
+        }
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', () => {
+        renderSubjectCards();
+
+        // Close profile menu on outside click
+        window.addEventListener('click', function(e) {
+            const profileMenu = document.getElementById('profileMenu');
+            const profilePic = document.querySelector('.profile');
+            if (!profilePic?.contains(e.target) && !profileMenu?.contains(e.target)) {
+                profileMenu?.classList.remove('active');
+            }
+        });
+    });
+
+    // Expose functions globally
+    window.openSubjectGrades = openSubjectGrades;
+    window.saveGrade = saveGrade;
+    window.handleGradeKeyPress = handleGradeKeyPress;
+</script>
+
+</body>
+</html>

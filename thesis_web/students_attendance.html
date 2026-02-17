@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Students Attendance | ADV-Attendify</title>
+
+  <style>
+    /* ===== ORIGINAL STYLES (fully preserved) ===== */
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body{
+      min-height:100vh;
+      overflow-x:hidden;
+      background:url("images/backgroundhome.png") center/cover no-repeat fixed;
+    }
+
+    nav{
+      position:fixed;
+      top:0;
+      width:100%;
+      padding:20px 40px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      background:rgba(0,0,0,0.25);
+      backdrop-filter:blur(8px);
+      z-index:1001;
+    }
+
+    .menu-btn{
+      font-size:28px;
+      background:none;
+      border:none;
+      color:#6fe3ff;
+      cursor:pointer;
+    }
+
+    .profile{
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      overflow:hidden;
+      cursor:pointer;
+      border:2px solid #6fe3ff;
+    }
+
+    .profile img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+
+    .profile-menu{
+      position:absolute;
+      top:55px;
+      right:0;
+      background:#0b2a3a;
+      border-radius:12px;
+      padding:10px 0;
+      min-width:170px;
+      opacity:0;
+      pointer-events:none;
+      transition:0.25s;
+    }
+
+    .profile-menu.active{
+      opacity:1;
+      pointer-events:all;
+    }
+
+    .profile-menu a{
+      display:block;
+      padding:12px 20px;
+      color:#dffaff;
+      text-decoration:none;
+    }
+
+    .profile-menu a:hover{
+      background:#1ea7d7;
+      color:#00141c;
+    }
+
+    /* ===== ATTENDANCE DISPLAY ===== */
+    .attendance-container {
+      margin-top: 100px;
+      margin-left: 250px;      /* space for sidebar */
+      padding: 30px 40px;
+      transition: margin-left 0.3s;
+      max-width: 1300px;
+    }
+
+    @media (max-width: 768px) {
+      .attendance-container {
+        margin-left: 20px;
+        padding: 20px;
+      }
+    }
+
+    .attendance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      color: #6fe3ff;
+      text-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    .attendance-header h1 {
+      font-size: 2.2rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: #6fe3ff;
+    }
+
+    .live-date {
+      background: rgba(10, 40, 55, 0.7);
+      backdrop-filter: blur(4px);
+      padding: 12px 24px;
+      border-radius: 50px;
+      border: 1px solid #3fc3e0;
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: #e6fbff;
+      box-shadow: 0 0 15px rgba(110, 227, 255, 0.2);
+    }
+
+    /* Upcoming subjects section */
+    .upcoming-section {
+      margin-bottom: 40px;
+    }
+
+    .section-title {
+      margin: 0 0 15px 0;
+      font-size: 1.6rem;
+      color: #6fe3ff;
+      border-bottom: 1px solid #53c8e0;
+      padding-bottom: 8px;
+      display: inline-block;
+      font-weight: 400;
+    }
+
+    .upcoming-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 15px;
+    }
+
+    .upcoming-card {
+      background: rgba(8, 35, 48, 0.8);
+      backdrop-filter: blur(8px);
+      border: 1px solid #2d99ae;
+      border-radius: 24px;
+      padding: 20px;
+      color: #dbfaff;
+      box-shadow: 0 8px 16px rgba(0,20,30,0.6);
+      transition: 0.2s;
+    }
+
+    .upcoming-card:hover {
+      transform: translateY(-3px);
+      border-color: #6fe3ff;
+      background: rgba(10, 45, 60, 0.9);
+    }
+
+    .upcoming-subject {
+      font-size: 1.4rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .upcoming-datetime {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin: 12px 0;
+      color: #b3e4ff;
+    }
+
+    .upcoming-datetime span {
+      background: rgba(0,0,0,0.3);
+      padding: 5px 12px;
+      border-radius: 30px;
+      display: inline-block;
+      width: fit-content;
+      font-size: 0.95rem;
+    }
+
+    .badge-upcoming {
+      background: #1ea7d7;
+      color: #00141c;
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: inline-block;
+    }
+
+    /* Recent logs title */
+    .recent-title {
+      margin: 30px 0 15px 0;
+      font-size: 1.6rem;
+      color: #0a8baf;
+      border-bottom: 1px solid #53c8e0;
+      padding-bottom: 8px;
+      display: inline-block;
+      font-weight: 400;
+    }
+
+    .attendance-log {
+      background: rgba(6, 28, 37, 0.7);
+      backdrop-filter: blur(6px);
+      border-radius: 24px;
+      padding: 10px;
+      border: 1px solid #2d99ae;
+    }
+
+    .log-row {
+      display: flex;
+      padding: 16px 22px;
+      border-bottom: 1px solid rgba(111, 227, 255, 0.15);
+      color: #dbffff;
+      font-size: 1.05rem;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .log-row:last-child {
+      border-bottom: none;
+    }
+
+    .log-subject {
+      width: 180px;
+      font-weight: 600;
+      color: #a8ecff;
+    }
+
+    .log-date {
+      width: 130px;
+    }
+
+    .log-timein, .log-timeout {
+      width: 110px;
+      font-family: monospace;
+    }
+
+    .log-status {
+      width: 100px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge {
+      background: #0d5e6b;
+      padding: 5px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      color: white;
+      text-transform: uppercase;
+    }
+
+    .badge-success {
+      background: #008b74;
+    }
+
+    .badge-absent {
+      background: #8b3a3a;
+      color: #ffd6d6;
+    }
+
+    .profile-wrapper {
+      position: relative;
+    }
+
+    #sidebarContainer {
+      position: relative;
+      z-index: 1002;
+    }
+
+    .hardware-badge {
+      display: inline-block;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(2px);
+      padding: 8px 18px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      color: #b6f2ff;
+      border: 1px dashed #5fdaff;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- sidebar injected dynamically -->
+  <div id="sidebarContainer"></div>
+
+  <nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    <div class="profile-wrapper">
+      <div class="profile" onclick="toggleProfileMenu()">
+        <img src="images/profile.png" alt="profile" id="navProfileImage">
+      </div>
+      <div id="profileMenu" class="profile-menu">
+        <a href="students_profile.html">Edit Profile</a>
+        <a href="#">Settings</a>
+        <a href="login.html">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN ATTENDANCE MONITOR -->
+  <div class="attendance-container">
+    
+    <!-- Header with live date/time monitor -->
+    <div class="attendance-header">
+      <h1>Student Attendance</h1>
+      <div class="live-date" id="liveDateDisplay">
+        <!-- dynamic date/time filled by JS -->
+      </div>
+    </div>
+
+    <!-- UPCOMING SUBJECTS SECTION (no emojis) -->
+    <div class="upcoming-section">
+      <h3 class="section-title">Upcoming Subjects</h3>
+      <div class="upcoming-grid" id="upcomingContainer">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- RECENT ATTENDANCE LOGS (with both present/absent) -->
+    <h3 class="recent-title">Recent Attendance Logs</h3>
+    <div class="attendance-log" id="attendanceLogContainer">
+      <!-- Will be populated by JavaScript with mix of present/absent -->
+    </div>
+    
+    <!-- Hardware source note -->
+    <div class="hardware-badge">
+       data retrieved from hardware · database records
+    </div>
+
+  </div> <!-- end attendance-container -->
+
+  <!-- overlay for sidebar -->
+  <div id="overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(3px); z-index:999; opacity:0; pointer-events:none; transition:0.25s;" onclick="toggleMenu()"></div>
+
+  <script>
+    // ===== SIDEBAR & PROFILE FUNCTIONS (preserved) =====
+    fetch("students_sidebar.html")
+      .then(r => r.text())
+      .then(html => {
+        document.getElementById("sidebarContainer").innerHTML = html;
+        initializeSidebar();
+      })
+      .catch(err => {
+        console.warn("sidebar.html not found – using fallback.");
+        let dummySidebar = document.createElement('div');
+        dummySidebar.id = 'sidebar';
+        dummySidebar.style.display = 'none';
+        document.getElementById("sidebarContainer").appendChild(dummySidebar);
+        let dummyOverlay = document.createElement('div');
+        dummyOverlay.id = 'overlay';
+        document.body.appendChild(dummyOverlay);
+        initializeSidebar();
+      });
+
+    function initializeSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      
+      if (sidebar && overlay) {
+        window.toggleMenu = function(){
+          sidebar.classList.toggle("active");
+          overlay.classList.toggle("active");
+        };
+        overlay.onclick = toggleMenu;
+      } else {
+        window.toggleMenu = function() { console.log("sidebar not loaded"); };
+      }
+    }
+
+    // Profile functions
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedImage = localStorage.getItem('profileImage');
+      if (savedImage) {
+        const navImg = document.getElementById('navProfileImage');
+        if (navImg) navImg.src = savedImage;
+      }
+    });
+
+    function toggleProfileMenu(){
+      const profileMenu = document.getElementById("profileMenu");
+      profileMenu.classList.toggle("active");
+    }
+
+    document.addEventListener("click", function(e){
+      const profile = document.querySelector(".profile");
+      const menu = document.getElementById("profileMenu");
+      if(profile && menu && !profile.contains(e.target) && !menu.contains(e.target)){
+        menu.classList.remove("active");
+      }
+    });
+
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'profileImage') {
+        const navImg = document.getElementById('navProfileImage');
+        if (navImg) navImg.src = e.newValue;
+      }
+    });
+
+    // ===== LIVE DATE DISPLAY (no emoji) =====
+    (function() {
+      function updateLiveDate() {
+        const now = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const formatted = now.toLocaleDateString('en-US', options);
+        const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        const liveEl = document.getElementById('liveDateDisplay');
+        if (liveEl) {
+          liveEl.innerHTML = `${formatted} &nbsp; <span style="background:rgba(0,0,0,0.2); padding:5px 10px; border-radius:30px;">${timeStr}</span>`;
+        }
+      }
+      updateLiveDate();
+      setInterval(updateLiveDate, 1000);
+    })();
+
+    // ===== UPCOMING SUBJECTS DATA (mock data, no emojis in template) =====
+    const upcomingSubjects = [
+      { 
+        name: 'Computer Networks', 
+        code: 'CNET401', 
+        date: '2025-04-10', 
+        startTime: '09:00', 
+        endTime: '10:30',
+        room: 'Room 301'
+      },
+      { 
+        name: 'Operating Systems', 
+        code: 'OS202', 
+        date: '2025-04-10', 
+        startTime: '11:00', 
+        endTime: '12:30',
+        room: 'Lab 105'
+      },
+      { 
+        name: 'Database Systems', 
+        code: 'DB310', 
+        date: '2025-04-11', 
+        startTime: '14:00', 
+        endTime: '15:30',
+        room: 'Room 215'
+      },
+      { 
+        name: 'Cybersecurity', 
+        code: 'SEC450', 
+        date: '2025-04-11', 
+        startTime: '08:30', 
+        endTime: '10:00',
+        room: 'Room 108'
+      },
+      { 
+        name: 'Web Development', 
+        code: 'WEB202', 
+        date: '2025-04-12', 
+        startTime: '13:00', 
+        endTime: '14:30',
+        room: 'Lab 210'
+      }
+    ];
+
+    // ===== ATTENDANCE LOGS (mixed present/absent) =====
+    const attendanceLogs = [
+      { subject: 'Computer Networks', date: '2025-04-09', timeIn: '08:53 AM', timeOut: '05:12 PM', status: 'Present' },
+      { subject: 'Operating Systems', date: '2025-04-09', timeIn: '09:02 AM', timeOut: '04:58 PM', status: 'Present' },
+      { subject: 'Database Systems', date: '2025-04-08', timeIn: '08:47 AM', timeOut: '05:20 PM', status: 'Present' },
+      { subject: 'Computer Networks', date: '2025-04-08', timeIn: '--', timeOut: '--', status: 'Absent' },
+      { subject: 'Cybersecurity', date: '2025-04-07', timeIn: '09:10 AM', timeOut: '04:45 PM', status: 'Present' },
+      { subject: 'Web Development', date: '2025-04-07', timeIn: '--', timeOut: '--', status: 'Absent' },
+      { subject: 'Operating Systems', date: '2025-04-06', timeIn: '09:05 AM', timeOut: '04:55 PM', status: 'Present' },
+      { subject: 'Database Systems', date: '2025-04-06', timeIn: '--', timeOut: '--', status: 'Absent' },
+      { subject: 'Computer Networks', date: '2025-04-05', timeIn: '08:55 AM', timeOut: '05:08 PM', status: 'Present' },
+      { subject: 'Cybersecurity', date: '2025-04-05', timeIn: '--', timeOut: '--', status: 'Absent' },
+    ];
+
+    // Function to render upcoming subjects (no emojis)
+    function renderUpcomingSubjects() {
+      const container = document.getElementById('upcomingContainer');
+      if (!container) return;
+
+      // Sort by date (closest first)
+      const sorted = [...upcomingSubjects].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      container.innerHTML = '';
+      sorted.forEach(sub => {
+        // Format date for display
+        const subDate = new Date(sub.date);
+        const formattedDate = subDate.toLocaleDateString('en-US', { 
+          weekday: 'short', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+
+        const card = document.createElement('div');
+        card.className = 'upcoming-card';
+        card.innerHTML = `
+          <div class="upcoming-subject">${sub.name} (${sub.code})</div>
+          <div class="upcoming-datetime">
+            <span>${formattedDate}</span>
+            <span>${sub.startTime} - ${sub.endTime}</span>
+            <span>${sub.room}</span>
+          </div>
+          <div class="badge-upcoming">Upcoming</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Function to render attendance logs
+    function renderAttendanceLogs() {
+      const container = document.getElementById('attendanceLogContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+      
+      attendanceLogs.forEach(log => {
+        const row = document.createElement('div');
+        row.className = 'log-row';
+
+        const statusClass = log.status === 'Present' ? 'badge-success' : 'badge-absent';
+        
+        row.innerHTML = `
+          <span class="log-subject">${log.subject}</span>
+          <span class="log-date">${log.date}</span>
+          <span class="log-timein">${log.timeIn}</span>
+          <span class="log-timeout">${log.timeOut}</span>
+          <span class="log-status">
+            <span class="badge ${statusClass}">${log.status}</span>
+          </span>
+        `;
+        
+        container.appendChild(row);
+      });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderUpcomingSubjects();
+      renderAttendanceLogs();
+    });
+
+  </script>
+</body>
+</html>

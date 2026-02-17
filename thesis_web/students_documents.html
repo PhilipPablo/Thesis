@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Students Document | ADV-Attendify</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:url("images/backgroundhome.png") center/cover no-repeat fixed;
+}
+
+nav{
+    position:fixed;
+    top:0;
+    width:100%;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(0,0,0,0.25);
+    backdrop-filter:blur(8px);
+    z-index:1001;
+}
+
+.menu-btn{
+    font-size:28px;
+    background:none;
+    border:none;
+    color:#6fe3ff;
+    cursor:pointer;
+}
+
+.profile{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    overflow:hidden;
+    cursor:pointer;
+    border:2px solid #6fe3ff;
+}
+
+.profile img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.profile-menu{
+    position:absolute;
+    top:55px;
+    right:0;
+    background:#0b2a3a;
+    border-radius:12px;
+    padding:10px 0;
+    min-width:170px;
+    opacity:0;
+    pointer-events:none;
+    transition:0.25s;
+}
+
+.profile-menu.active{
+    opacity:1;
+    pointer-events:all;
+}
+
+.profile-menu a{
+    display:block;
+    padding:12px 20px;
+    color:#dffaff;
+    text-decoration:none;
+}
+
+.profile-menu a:hover{
+    background:#1ea7d7;
+    color:#00141c;
+}
+
+/* main content adjustment */
+.main-content {
+    margin-top: 100px;
+    padding: 30px 40px;
+    margin-left: 0;
+    transition: margin-left 0.3s;
+    position: relative;
+    z-index: 1;
+}
+
+/* certificate panel */
+.certificate-panel {
+    background: rgba(10, 25, 35, 0.85);
+    backdrop-filter: blur(6px);
+    border-radius: 28px;
+    padding: 28px 32px;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(111, 227, 255, 0.25);
+}
+
+.certificate-panel h2 {
+    color: #b3f0ff;
+    font-weight: 400;
+    font-size: 28px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #1ea7d7;
+    padding-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+/* form rows */
+.row {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.input-group {
+    flex: 1 1 200px;
+    min-width: 180px;
+}
+
+.input-group label {
+    display: block;
+    color: #a8d8ea;
+    font-size: 14px;
+    margin-bottom: 6px;
+    font-weight: 300;
+}
+
+.input-group input, 
+.input-group select {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(0, 30, 45, 0.7);
+    border: 1px solid #2f6f87;
+    border-radius: 40px;
+    color: #e2f2ff;
+    font-size: 15px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.input-group input:focus, 
+.input-group select:focus {
+    border-color: #6fe3ff;
+    background: #0a2f40;
+}
+
+.input-group input::placeholder {
+    color: #688f9e;
+    font-weight: 300;
+}
+
+/* single document card (certification only) */
+.doc-single {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0 20px;
+}
+
+.doc-card {
+    background: rgba(0, 20, 30, 0.7);
+    border-radius: 28px;
+    padding: 28px 22px;
+    flex: 0 1 400px;
+    border: 1px solid #20586b;
+    transition: 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.doc-icon {
+    width: 60px;
+    height: 60px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.doc-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.doc-card h3 {
+    color: #d3f2ff;
+    font-weight: 400;
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+.doc-card p {
+    color: #97c8da;
+    font-size: 14px;
+    margin-bottom: 22px;
+    font-weight: 300;
+}
+
+.print-btn {
+    background: transparent;
+    border: 1.5px solid #1ea7d7;
+    color: #c7edff;
+    padding: 12px 32px;
+    border-radius: 40px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.2s;
+    width: fit-content;
+    font-weight: 400;
+}
+
+.print-btn:hover {
+    background: #1ea7d7;
+    color: #001f2b;
+    border-color: #6fe3ff;
+}
+
+/* info hint */
+.hint-note {
+    color: #84b9cc;
+    font-size: 14px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px dashed #1f677e;
+    font-style: italic;
+}
+
+/* for print layout */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    .printable-area, .printable-area * {
+        visibility: visible;
+    }
+    .printable-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white;
+        color: black;
+        padding: 40px;
+    }
+    .printable-area .print-header {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 24px;
+        border-bottom: 2px solid #333;
+    }
+    .printable-area .print-content {
+        font-size: 16px;
+        white-space: pre-wrap;
+    }
+    .print-btn, .menu-btn, .profile, .profile-menu, nav {
+        display: none;
+    }
+}
+
+    .profile-wrapper {
+      position: relative;
+    }
+
+    #sidebarContainer {
+        position: relative;
+        z-index: 1002;
+    }
+
+</style>
+</head>
+<body>
+
+<div id="sidebarContainer"></div>
+
+<nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <div class="profile-wrapper">
+        <div class="profile" onclick="toggleProfileMenu(event)">
+            <img src="images/profile.png" id="navProfileImage" alt="profile">
+        </div>
+
+        <div id="profileMenu" class="profile-menu">
+            <a href="students_profile.html">Edit Profile</a>
+            <a href="#">Settings</a>
+            <a href="login.html">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- main panel for certification of grades only -->
+<div class="main-content">
+    <div class="certificate-panel">
+        <h2>Official Documents</h2>
+        
+        <!-- student info row (always visible) -->
+        <div class="row">
+            <div class="input-group">
+                <label>Full name (as shown on records)</label>
+                <input type="text" id="studentNameInput" placeholder="e.g. Reyes, Maria C." value="Cruz, Ana Marie">
+            </div>
+            <div class="input-group">
+                <label>Student ID</label>
+                <input type="text" id="studentIdInput" placeholder="XX-XXXXX" value="410023-12012">
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group">
+                <label>Academic term</label>
+                <select id="termSelect">
+                    <option>1st Semester 2024-2025</option>
+                    <option>2nd Semester 2024-2025</option>
+                    <option>Summer 2025</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Year level</label>
+                <select id="yearLevelSelect">
+                    <option>1st Year</option>
+                    <option>2nd Year</option>
+                    <option selected>3rd Year</option>
+                    <option>4th Year</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- only certification of grades card with image instead of emoji -->
+        <div class="doc-single">
+            <div class="doc-card">
+                <div class="doc-icon">
+                    <img src="images/forms.png" alt="certification icon">
+                </div>
+                <h3>certification of grades</h3>
+                <p>official sealed copy of your grades for the selected term.</p>
+                <button class="print-btn" id="printGradesBtn">print document</button>
+            </div>
+        </div>
+
+        <!-- optional hint (same design) -->
+        <div class="hint-note">
+            ⚠️ documents reflect real‑time records. ensure name & id are correct.
+        </div>
+    </div>
+</div>
+
+<!-- hidden printable area (will be filled dynamically) -->
+<div id="printableArea" class="printable-area" style="visibility:hidden; height:0; overflow:hidden;"></div>
+
+<!-- overlay for sidebar - fixed positioning -->
+<div id="overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(3px); z-index:999; opacity:0; pointer-events:none; transition:0.25s;" onclick="toggleMenu()"></div>
+
+<script>
+    // ===== SIDEBAR FUNCTIONS =====
+    fetch("students_sidebar.html")
+      .then(r => r.text())
+      .then(html => {
+        document.getElementById("sidebarContainer").innerHTML = html;
+        initializeSidebar();
+      })
+      .catch(err => {
+        console.warn("sidebar.html not found – using fallback.");
+        let dummySidebar = document.createElement('div');
+        dummySidebar.id = 'sidebar';
+        dummySidebar.style.display = 'none';
+        document.getElementById("sidebarContainer").appendChild(dummySidebar);
+        let dummyOverlay = document.createElement('div');
+        dummyOverlay.id = 'overlay';
+        document.body.appendChild(dummyOverlay);
+        initializeSidebar();
+      });
+
+    function initializeSidebar() {
+      const sidebar = document.getElementById("sidebar");
+      const overlay = document.getElementById("overlay");
+      
+      if (sidebar && overlay) {
+        window.toggleMenu = function(){
+          sidebar.classList.toggle("active");
+          overlay.classList.toggle("active");
+        };
+        overlay.onclick = toggleMenu;
+      } else {
+        window.toggleMenu = function() { console.log("sidebar not loaded"); };
+      }
+    }
+
+    // ---------- profile menu logic ----------
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedImage = localStorage.getItem('profileImage');
+      if (savedImage) {
+        const navImg = document.getElementById('navProfileImage');
+        if (navImg) navImg.src = savedImage;
+      }
+    });
+
+    function toggleProfileMenu(){
+      const profileMenu = document.getElementById("profileMenu");
+      profileMenu.classList.toggle("active");
+    }
+
+    // Close profile menu when clicking outside
+    document.addEventListener("click", function(e){
+      const profile = document.querySelector(".profile");
+      const menu = document.getElementById("profileMenu");
+      if(profile && menu && !profile.contains(e.target) && !menu.contains(e.target)){
+        menu.classList.remove("active");
+      }
+    });
+
+    // listen to storage updates
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'profileImage') {
+        const navImg = document.getElementById('navProfileImage');
+        if (navImg) navImg.src = e.newValue;
+      }
+    });
+
+    // ---------- PRINTING FUNCTION (certificate only) ----------
+    const printableArea = document.getElementById('printableArea');
+    const studentNameInput = document.getElementById('studentNameInput');
+    const studentIdInput = document.getElementById('studentIdInput');
+    const termSelect = document.getElementById('termSelect');
+    const yearLevelSelect = document.getElementById('yearLevelSelect');
+
+    function getCurrentDateTime() {
+        const d = new Date();
+        return d.toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+
+    function printDocument(contentHTML) {
+        // fill printable area
+        printableArea.style.visibility = 'visible';
+        printableArea.style.height = 'auto';
+        printableArea.style.overflow = 'visible';
+        printableArea.innerHTML = contentHTML;
+
+        // call print
+        window.print();
+
+        // hide again after printing (with slight delay)
+        setTimeout(() => {
+            printableArea.style.visibility = 'hidden';
+            printableArea.style.height = '0';
+            printableArea.style.overflow = 'hidden';
+            printableArea.innerHTML = ''; // clear
+        }, 500);
+    }
+
+    document.getElementById('printGradesBtn').addEventListener('click', function () {
+        const name = studentNameInput.value.trim() || '___________________';
+        const studentId = studentIdInput.value.trim() || '__________';
+        const term = termSelect.value;
+        const year = yearLevelSelect.value;
+        const now = getCurrentDateTime();
+
+        // dummy grade table
+        const gradesTable = `
+            <table style="width:100%; border-collapse:collapse; margin:20px 0; background:white; color:black;" border="1" cellpadding="8">
+                <tr style="background:#e0e0e0;"><th>Course</th><th>Description</th><th>Units</th><th>Grade</th></tr>
+                <tr><td>CS 301</td><td>Advanced Algorithms</td><td>3</td><td>1.50</td></tr>
+                <tr><td>CS 312</td><td>Software Engineering</td><td>3</td><td>1.75</td></tr>
+                <tr><td>MATH 210</td><td>Linear Algebra</td><td>2</td><td>1.25</td></tr>
+                <tr><td>PHYS 101</td><td>Physics for Computing</td><td>2</td><td>1.00</td></tr>
+                <tr><td>GEC 105</td><td>Ethics</td><td>3</td><td>1.50</td></tr>
+                <tr style="background:#f0f0f0;"><td colspan="3" style="text-align:right;"><strong>GWA:</strong></td><td><strong>1.42</strong></td></tr>
+            </table>
+        `;
+
+        const certHTML = `
+            <div class="print-header">CERTIFICATION OF GRADES</div>
+            <div class="print-content" style="font-size:16px; line-height:1.8; color:black;">
+                <p><strong>Student:</strong> ${name} &nbsp;&nbsp; <strong>ID:</strong> ${studentId}</p>
+                <p><strong>Term:</strong> ${term} &nbsp;&nbsp; <strong>Year level:</strong> ${year}</p>
+                <p><strong>Date generated:</strong> ${now}</p>
+                <p><em>Official copy issued by ADV-Attendify registrar</em></p>
+                ${gradesTable}
+                <p style="margin-top:40px;">_________________________<br>Registrar's signature</p>
+            </div>
+        `;
+        printDocument(certHTML);
+    });
+</script>
+
+</body>
+</html>
