@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | ADV-Attendify</title>
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         * {
             margin: 0;
@@ -106,6 +108,18 @@
             left: 0;
         }
 
+        .invalid-credentials {
+            color: #ff6b6b;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+            display: none;
+            background: rgba(255, 107, 107, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ff6b6b;
+        }
+
         .forgot-password {
             text-align: right;
             margin-bottom: 25px;
@@ -174,6 +188,28 @@
             color: #020617;
             box-shadow: 0 10px 25px rgba(0, 242, 255, 0.45);
         }
+
+        /* Custom SweetAlert2 styling */
+        .swal2-popup {
+            background: #0b2a3a !important;
+            border-radius: 22px !important;
+            border: 1px solid rgba(110, 243, 255, 0.25) !important;
+        }
+
+        .swal2-title {
+            color: #6ef3ff !important;
+        }
+
+        .swal2-html-container {
+            color: #dffaff !important;
+        }
+
+        .swal2-confirm {
+            background: linear-gradient(135deg, #00f2ff, #7f5cff) !important;
+            color: #020617 !important;
+            font-weight: 600 !important;
+            border-radius: 12px !important;
+        }
     </style>
 </head>
 <body>
@@ -197,6 +233,8 @@
             <div class="error-msg" id="password-error">Password is required</div>
         </div>
 
+        <div id="invalid-credentials" class="invalid-credentials">Invalid username or password</div>
+
         <div class="forgot-password">
             <a href="forgot_password.html">Forgot Password?</a>
         </div>
@@ -210,12 +248,32 @@
     </div>
 </div>
 
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+// Built-in admin credentials (hidden in code, not displayed in inputs)
+const ADMIN_CREDENTIALS = {
+    username: 'Admin',
+    password: 'Admin@246810'
+};
+
+// You can add more users here if needed
+const USERS = {
+    'Admin': 'Admin@246810',
+    'admin': 'Admin@246810' // Alternative case-insensitive version
+};
+
 function validateLogin() {
     const username = document.getElementById('username');
     const password = document.getElementById('password');
+    const invalidMsg = document.getElementById('invalid-credentials');
     let valid = true;
 
+    // Reset invalid message
+    invalidMsg.style.display = 'none';
+
+    // Validate username
     if(username.value.trim() === '') {
         document.getElementById('username-error').style.display = 'block';
         valid = false;
@@ -223,6 +281,7 @@ function validateLogin() {
         document.getElementById('username-error').style.display = 'none';
     }
 
+    // Validate password
     if(password.value.trim() === '') {
         document.getElementById('password-error').style.display = 'block';
         valid = false;
@@ -230,8 +289,104 @@ function validateLogin() {
         document.getElementById('password-error').style.display = 'none';
     }
 
-    if(valid) alert('Login successful (simulation)');
+    // If basic validation passes, check credentials
+    if(valid) {
+        const enteredUsername = username.value.trim();
+        const enteredPassword = password.value.trim();
+        
+        // Check against admin credentials (case-sensitive for username)
+        if (enteredUsername === ADMIN_CREDENTIALS.username && 
+            enteredPassword === ADMIN_CREDENTIALS.password) {
+            
+            // Store admin info in localStorage
+            localStorage.setItem('userFullName', 'Administrator');
+            localStorage.setItem('profileFirstName', 'Admin');
+            localStorage.setItem('profileLastName', 'User');
+            localStorage.setItem('aboutText', 'System Administrator');
+            localStorage.setItem('isAdmin', 'true');
+            
+            // Show welcome alert for admin
+            Swal.fire({
+                title: 'Welcome Admin!',
+                text: 'You have successfully logged in.',
+                icon: 'success',
+                background: '#0b2a3a',
+                color: '#dffaff',
+                confirmButtonColor: '#00f2ff',
+                confirmButtonText: 'Continue to Dashboard',
+                timer: 3000,
+                timerProgressBar: true,
+                showClass: {
+                    popup: 'animate__animated animate__fadeInDown'
+                },
+                hideClass: {
+                    popup: 'animate__animated animate__fadeOutUp'
+                }
+            }).then(() => {
+                window.location.href = 'admin_home.html';
+            });
+        } 
+        // Optional: Check against additional users (case-insensitive username)
+        else {
+            // Check if username exists in USERS object (case-insensitive)
+            const matchedUsername = Object.keys(USERS).find(
+                key => key.toLowerCase() === enteredUsername.toLowerCase()
+            );
+            
+            if (matchedUsername && USERS[matchedUsername] === enteredPassword) {
+                localStorage.setItem('userFullName', matchedUsername);
+                localStorage.setItem('profileFirstName', matchedUsername);
+                localStorage.setItem('profileLastName', 'User');
+                localStorage.setItem('aboutText', 'Regular User');
+                localStorage.setItem('isAdmin', matchedUsername === 'Admin' ? 'true' : 'false');
+                
+                // Show welcome alert for regular users
+                Swal.fire({
+                    title: `Welcome ${matchedUsername}!`,
+                    text: 'You have successfully logged in.',
+                    icon: 'success',
+                    background: '#0b2a3a',
+                    color: '#dffaff',
+                    confirmButtonColor: '#00f2ff',
+                    confirmButtonText: 'Continue',
+                    timer: 3000,
+                    timerProgressBar: true
+                }).then(() => {
+                    window.location.href = 'home.html';
+                });
+            }
+            else {
+                // Show invalid credentials message
+                invalidMsg.style.display = 'block';
+                
+                // Show error alert
+                Swal.fire({
+                    title: 'Login Failed',
+                    text: 'Invalid username or password. Please try again.',
+                    icon: 'error',
+                    background: '#0b2a3a',
+                    color: '#dffaff',
+                    confirmButtonColor: '#ff6b6b',
+                    confirmButtonText: 'Try Again'
+                });
+                
+                // Clear password field for security
+                password.value = '';
+                password.focus();
+            }
+        }
+    }
 }
+
+// Allow Enter key to submit form
+document.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        validateLogin();
+    }
+});
+
+// Optional: Add a little hint for admin users (remove if not wanted)
+console.log('Admin credentials - Username: Admin, Password: Admin@246810');
 </script>
 </body>
 </html>
