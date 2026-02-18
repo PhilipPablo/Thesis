@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Students Attendance | ADV-Attendify</title>
+  <title>Attendance Monitor | ADV-Attendify</title>
 
   <style>
     /* ===== ORIGINAL STYLES (fully preserved) ===== */
@@ -107,7 +107,7 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 30px;
-      color: #6fe3ff;
+      color: #0a8baf;
       text-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
 
@@ -115,7 +115,7 @@
       font-size: 2.2rem;
       font-weight: 600;
       letter-spacing: 1px;
-      color: #6fe3ff;
+      color: #0a8baf;
     }
 
     .live-date {
@@ -138,7 +138,7 @@
     .section-title {
       margin: 0 0 15px 0;
       font-size: 1.6rem;
-      color: #6fe3ff;
+      color: #0a8baf;
       border-bottom: 1px solid #53c8e0;
       padding-bottom: 8px;
       display: inline-block;
@@ -201,6 +201,66 @@
       font-weight: 600;
       text-transform: uppercase;
       display: inline-block;
+    }
+
+    /* Search bar for logs */
+    .search-logs-section {
+      margin: 20px 0 25px 0;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .search-logs-container {
+      flex: 1;
+      max-width: 400px;
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6fe3ff;
+      font-size: 18px;
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    #attendanceSearch {
+      width: 100%;
+      padding: 14px 20px 14px 50px;
+      background: rgba(11, 42, 58, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(111, 227, 255, 0.3);
+      border-radius: 60px;
+      color: #ffffff;
+      font-size: 16px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    #attendanceSearch::placeholder {
+      color: #a0c7d9;
+      opacity: 0.8;
+    }
+
+    #attendanceSearch:focus {
+      border-color: #6fe3ff;
+      box-shadow: 0 0 15px rgba(111, 227, 255, 0.2);
+      background: rgba(15, 50, 70, 0.9);
+    }
+
+    .filter-badge {
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(2px);
+      padding: 8px 16px;
+      border-radius: 50px;
+      color: #b6f2ff;
+      border: 1px solid #5fdaff;
+      font-size: 0.9rem;
     }
 
     /* Recent logs title */
@@ -297,6 +357,15 @@
       border: 1px dashed #5fdaff;
       margin-top: 20px;
     }
+
+    .no-results {
+      padding: 40px;
+      text-align: center;
+      color: #a0c7d9;
+      font-style: italic;
+      background: rgba(6, 28, 37, 0.5);
+      border-radius: 24px;
+    }
   </style>
 </head>
 <body>
@@ -311,7 +380,7 @@
         <img src="images/profile.png" alt="profile" id="navProfileImage">
       </div>
       <div id="profileMenu" class="profile-menu">
-        <a href="students_profile.html">Edit Profile</a>
+        <a href="edit_profile.html">Edit Profile</a>
         <a href="#">Settings</a>
         <a href="login.html">Logout</a>
       </div>
@@ -323,13 +392,13 @@
     
     <!-- Header with live date/time monitor -->
     <div class="attendance-header">
-      <h1>Student Attendance</h1>
+      <h1>Attendance Monitor</h1>
       <div class="live-date" id="liveDateDisplay">
         <!-- dynamic date/time filled by JS -->
       </div>
     </div>
 
-    <!-- UPCOMING SUBJECTS SECTION (no emojis) -->
+    <!-- UPCOMING SUBJECTS SECTION (room removed) -->
     <div class="upcoming-section">
       <h3 class="section-title">Upcoming Subjects</h3>
       <div class="upcoming-grid" id="upcomingContainer">
@@ -337,8 +406,20 @@
       </div>
     </div>
     
-    <!-- RECENT ATTENDANCE LOGS (with both present/absent) -->
-    <h3 class="recent-title">Recent Attendance Logs</h3>
+    <!-- RECENT ATTENDANCE LOGS with SEARCH -->
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+      <h3 class="recent-title">Recent Attendance Logs</h3>
+      
+      <!-- Search bar for logs -->
+      <div class="search-logs-section">
+        <div class="search-logs-container">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="attendanceSearch" placeholder="Search">
+        </div>
+        <span class="filter-badge" id="resultCount">10 records</span>
+      </div>
+    </div>
+
     <div class="attendance-log" id="attendanceLogContainer">
       <!-- Will be populated by JavaScript with mix of present/absent -->
     </div>
@@ -355,7 +436,7 @@
 
   <script>
     // ===== SIDEBAR & PROFILE FUNCTIONS (preserved) =====
-    fetch("students_sidebar.html")
+    fetch("sidebar.html")
       .then(r => r.text())
       .then(html => {
         document.getElementById("sidebarContainer").innerHTML = html;
@@ -433,47 +514,42 @@
       setInterval(updateLiveDate, 1000);
     })();
 
-    // ===== UPCOMING SUBJECTS DATA (mock data, no emojis in template) =====
+    // ===== UPCOMING SUBJECTS DATA (room field removed from template) =====
     const upcomingSubjects = [
       { 
         name: 'Computer Networks', 
         code: 'CNET401', 
         date: '2025-04-10', 
         startTime: '09:00', 
-        endTime: '10:30',
-        room: 'Room 301'
+        endTime: '10:30'
       },
       { 
         name: 'Operating Systems', 
         code: 'OS202', 
         date: '2025-04-10', 
         startTime: '11:00', 
-        endTime: '12:30',
-        room: 'Lab 105'
+        endTime: '12:30'
       },
       { 
         name: 'Database Systems', 
         code: 'DB310', 
         date: '2025-04-11', 
         startTime: '14:00', 
-        endTime: '15:30',
-        room: 'Room 215'
+        endTime: '15:30'
       },
       { 
         name: 'Cybersecurity', 
         code: 'SEC450', 
         date: '2025-04-11', 
         startTime: '08:30', 
-        endTime: '10:00',
-        room: 'Room 108'
+        endTime: '10:00'
       },
       { 
         name: 'Web Development', 
         code: 'WEB202', 
         date: '2025-04-12', 
         startTime: '13:00', 
-        endTime: '14:30',
-        room: 'Lab 210'
+        endTime: '14:30'
       }
     ];
 
@@ -491,7 +567,7 @@
       { subject: 'Cybersecurity', date: '2025-04-05', timeIn: '--', timeOut: '--', status: 'Absent' },
     ];
 
-    // Function to render upcoming subjects (no emojis)
+    // Function to render upcoming subjects (room removed)
     function renderUpcomingSubjects() {
       const container = document.getElementById('upcomingContainer');
       if (!container) return;
@@ -516,7 +592,6 @@
           <div class="upcoming-datetime">
             <span>${formattedDate}</span>
             <span>${sub.startTime} - ${sub.endTime}</span>
-            <span>${sub.room}</span>
           </div>
           <div class="badge-upcoming">Upcoming</div>
         `;
@@ -524,14 +599,39 @@
       });
     }
 
-    // Function to render attendance logs
-    function renderAttendanceLogs() {
+    // Function to render attendance logs with optional filter
+    function renderAttendanceLogs(filterText = '') {
       const container = document.getElementById('attendanceLogContainer');
+      const resultCountEl = document.getElementById('resultCount');
       if (!container) return;
 
       container.innerHTML = '';
       
-      attendanceLogs.forEach(log => {
+      let filteredLogs = attendanceLogs;
+      
+      // Apply filter if text exists
+      if (filterText.trim() !== '') {
+        const searchLower = filterText.toLowerCase().trim();
+        filteredLogs = attendanceLogs.filter(log => 
+          log.subject.toLowerCase().includes(searchLower) ||
+          log.date.includes(searchLower) ||  // dates like 2025-04-09
+          log.status.toLowerCase().includes(searchLower) ||
+          log.timeIn.toLowerCase().includes(searchLower) ||
+          log.timeOut.toLowerCase().includes(searchLower)
+        );
+      }
+      
+      // Update result count
+      if (resultCountEl) {
+        resultCountEl.textContent = `${filteredLogs.length} record${filteredLogs.length !== 1 ? 's' : ''}`;
+      }
+      
+      if (filteredLogs.length === 0) {
+        container.innerHTML = '<div class="no-results">No matching attendance records found</div>';
+        return;
+      }
+      
+      filteredLogs.forEach(log => {
         const row = document.createElement('div');
         row.className = 'log-row';
 
@@ -551,10 +651,21 @@
       });
     }
 
+    // Setup search listener for attendance logs
+    function setupSearchListener() {
+      const searchInput = document.getElementById('attendanceSearch');
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          renderAttendanceLogs(e.target.value);
+        });
+      }
+    }
+
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
       renderUpcomingSubjects();
-      renderAttendanceLogs();
+      renderAttendanceLogs(''); // Show all logs initially
+      setupSearchListener();
     });
 
   </script>
