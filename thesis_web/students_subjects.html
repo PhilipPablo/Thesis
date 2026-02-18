@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Student Subjects | ADV-Attendify</title>
+<title>Home | ADV-Attendify</title>
 
 <style>
 *{
@@ -92,7 +92,7 @@ nav{
 }
 
 .welcome-section {
-    background: rgba(10, 25, 35, 0.85);
+    background: rgba(11, 42, 58, 0.7);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
@@ -110,6 +110,51 @@ nav{
     color: #dffaff;
     font-size: 16px;
     opacity: 0.9;
+}
+
+/* Search Bar */
+.search-section {
+    margin-bottom: 30px;
+}
+
+.search-container {
+    max-width: 500px;
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6fe3ff;
+    font-size: 18px;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+#subjectSearch {
+    width: 100%;
+    padding: 16px 20px 16px 50px;
+    background: rgba(11, 42, 58, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(111, 227, 255, 0.3);
+    border-radius: 60px;
+    color: #ffffff;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#subjectSearch::placeholder {
+    color: #a0c7d9;
+    opacity: 0.8;
+}
+
+#subjectSearch:focus {
+    border-color: #6fe3ff;
+    box-shadow: 0 0 15px rgba(111, 227, 255, 0.2);
+    background: rgba(15, 50, 70, 0.9);
 }
 
 /* Subjects Grid */
@@ -130,7 +175,7 @@ nav{
 
 .subjects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 25px;
 }
 
@@ -143,6 +188,7 @@ nav{
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .subject-card::before {
@@ -174,16 +220,17 @@ nav{
 }
 
 .subject-icon {
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
     background: rgba(111, 227, 255, 0.1);
-    border-radius: 8px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #6fe3ff;
     font-size: 20px;
     font-weight: 600;
+    border: 1px solid rgba(111, 227, 255, 0.3);
 }
 
 .subject-name {
@@ -193,97 +240,96 @@ nav{
     letter-spacing: 0.3px;
 }
 
+.subject-code {
+    display: block;
+    font-size: 14px;
+    color: #a0e7ff;
+    opacity: 0.8;
+    margin-top: 4px;
+}
+
 .professor-info {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 20px;
+    margin-top: 8px;
     color: #dffaff;
 }
 
 .professor-avatar {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    height: 40px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #a0e7ff;
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
     text-transform: uppercase;
+    border: 1px solid rgba(111, 227, 255, 0.2);
 }
 
 .professor-name {
     color: #dffaff;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 400;
 }
 
 .professor-dept {
     display: block;
-    font-size: 12px;
+    font-size: 13px;
     opacity: 0.7;
-    margin-top: 2px;
+    margin-top: 3px;
 }
 
-.subject-details {
+/* Grade section */
+.grade-section {
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(111, 227, 255, 0.2);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(111, 227, 255, 0.2);
 }
 
-.schedule {
+.grade-label {
     color: #a0e7ff;
     font-size: 14px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    font-weight: 300;
+    letter-spacing: 0.3px;
 }
 
-.schedule-icon {
-    opacity: 0.8;
-}
-
-.attendance-badge {
+.grade-value {
     background: rgba(111, 227, 255, 0.15);
     color: #6fe3ff;
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    border: 1px solid rgba(111, 227, 255, 0.3);
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 600;
+    border: 1px solid rgba(111, 227, 255, 0.4);
 }
 
-.loading {
-    text-align: center;
-    padding: 40px;
-    color: #dffaff;
-    font-size: 16px;
-    grid-column: 1 / -1;
-    letter-spacing: 0.5px;
-}
-
-.error-message {
-    text-align: center;
-    padding: 40px;
-    color: #ff8a8a;
-    background: rgba(11, 42, 58, 0.8);
-    border-radius: 16px;
-    grid-column: 1 / -1;
-}
-
-.no-subjects {
+/* Loading & empty states */
+.loading, .error-message, .no-subjects {
     text-align: center;
     padding: 60px 40px;
     color: #dffaff;
     background: rgba(11, 42, 58, 0.8);
     border-radius: 16px;
     grid-column: 1 / -1;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(111, 227, 255, 0.2);
+}
+
+.loading {
+    color: #a0e7ff;
+    font-size: 16px;
+}
+
+.error-message {
+    color: #ff8a8a;
 }
 
 .no-subjects p {
@@ -307,17 +353,11 @@ nav{
     .subjects-grid {
         grid-template-columns: 1fr;
     }
+    
+    .search-container {
+        max-width: 100%;
+    }
 }
-
-    .profile-wrapper {
-      position: relative;
-    }
-
-    #sidebarContainer {
-      position: relative;
-      z-index: 1002;
-    }
-
 </style>
 </head>
 <body>
@@ -333,7 +373,7 @@ nav{
         </div>
 
         <div id="profileMenu" class="profile-menu">
-            <a href="students_profile.html">Edit Profile</a>
+            <a href="edit_profile.html">Edit Profile</a>
             <a href="#">Settings</a>
             <a href="login.html">Logout</a>
         </div>
@@ -344,7 +384,15 @@ nav{
 <div class="main-content">
     <div class="welcome-section">
         <h1>Welcome back, <span id="fullNameDisplay">Student</span>!</h1>
-        <p>Here are your enrolled subjects for Semester <span id="semesterDisplay">1</span>, AY <span id="academicYearDisplay">2025-2026</span></p>
+        <p>Here are your subjects</p>
+    </div>
+
+    <!-- Search Bar Section -->
+    <div class="search-section">
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="subjectSearch" placeholder="Search subjects by name, code, or grade...">
+        </div>
     </div>
 
     <!-- Subjects Section -->
@@ -365,9 +413,7 @@ nav{
     // DATABASE SIMULATION / API SERVICE LAYER
     // ============================================
     
-    // Database schema for subjects and professors
     const DatabaseService = {
-        // Mock database tables
         _tables: {
             students: [
                 { id: 1, fullName: "John Doe", studentId: "2024-001", semester: 1, academicYear: "2025-2026" }
@@ -383,39 +429,34 @@ nav{
             ],
             
             subjects: [
-                { id: 101, code: "CS301", name: "Data Structures & Algorithms", professorId: 1, schedule: "Mon, Wed | 10:00 AM", room: "Room 401", icon: "DSA" },
-                { id: 102, code: "IT202", name: "Web Development", professorId: 2, schedule: "Tue, Thu | 2:00 PM", room: "Lab 203", icon: "WEB" },
-                { id: 103, code: "CS250", name: "Database Systems", professorId: 3, schedule: "Mon, Wed | 1:00 PM", room: "Room 305", icon: "DB" },
-                { id: 104, code: "AI401", name: "Artificial Intelligence", professorId: 4, schedule: "Tue, Thu | 11:00 AM", room: "Lab 101", icon: "AI" },
-                { id: 105, code: "IT305", name: "Mobile App Development", professorId: 5, schedule: "Fri | 9:00 AM", room: "Lab 204", icon: "MAD" },
-                { id: 106, code: "CYB201", name: "Cybersecurity Fundamentals", professorId: 6, schedule: "Wed, Fri | 3:00 PM", room: "Room 210", icon: "SEC" },
-                { id: 107, code: "CS350", name: "Operating Systems", professorId: 1, schedule: "Mon, Wed | 3:00 PM", room: "Room 402", icon: "OS" },
-                { id: 108, code: "IT315", name: "Cloud Computing", professorId: 2, schedule: "Tue, Thu | 9:00 AM", room: "Lab 205", icon: "CLD" }
+                { id: 101, code: "CS301", name: "Data Structures & Algorithms", professorId: 1 },
+                { id: 102, code: "IT202", name: "Web Development", professorId: 2 },
+                { id: 103, code: "CS250", name: "Database Systems", professorId: 3 },
+                { id: 104, code: "AI401", name: "Artificial Intelligence", professorId: 4 },
+                { id: 105, code: "IT305", name: "Mobile App Development", professorId: 5 },
+                { id: 106, code: "CYB201", name: "Cybersecurity Fundamentals", professorId: 6 },
+                { id: 107, code: "CS350", name: "Operating Systems", professorId: 1 },
+                { id: 108, code: "IT315", name: "Cloud Computing", professorId: 2 }
             ],
             
             enrollments: [
-                { studentId: 1, subjectId: 101, attendance: 85, currentGrade: "A-" },
-                { studentId: 1, subjectId: 102, attendance: 92, currentGrade: "A" },
-                { studentId: 1, subjectId: 103, attendance: 78, currentGrade: "B+" },
-                { studentId: 1, subjectId: 104, attendance: 94, currentGrade: "A" },
-                { studentId: 1, subjectId: 105, attendance: 88, currentGrade: "B+" },
-                { studentId: 1, subjectId: 106, attendance: 81, currentGrade: "B" }
+                { studentId: 1, subjectId: 101, grade: 85 },
+                { studentId: 1, subjectId: 102, grade: 92 },
+                { studentId: 1, subjectId: 103, grade: 78 },
+                { studentId: 1, subjectId: 104, grade: 94 },
+                { studentId: 1, subjectId: 105, grade: 88 },
+                { studentId: 1, subjectId: 106, grade: 81 }
             ]
         },
 
-        // Current logged in user
         currentUser: { id: 1, type: 'student' },
-
-        // ============================================
-        // API METHODS
-        // ============================================
 
         async getStudentInfo(studentId) {
             return new Promise((resolve) => {
                 setTimeout(() => {
                     const student = this._tables.students.find(s => s.id === studentId);
                     resolve(student || this._tables.students[0]);
-                }, 300);
+                }, 200);
             });
         },
 
@@ -431,8 +472,7 @@ nav{
                             
                             return {
                                 ...subject,
-                                attendance: enrollment.attendance,
-                                grade: enrollment.currentGrade,
+                                grade: enrollment.grade,  // Numerical grade like 85, 92, 78
                                 professorName: professor.name,
                                 professorInitials: professor.initials,
                                 professorEmail: professor.email,
@@ -444,45 +484,6 @@ nav{
                     } catch (error) {
                         reject(error);
                     }
-                }, 500);
-            });
-        },
-
-        async getAllSubjects() {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const subjectsWithProfessors = this._tables.subjects.map(subject => {
-                        const professor = this._tables.professors.find(p => p.id === subject.professorId);
-                        return {
-                            ...subject,
-                            professorName: professor.name,
-                            professorInitials: professor.initials
-                        };
-                    });
-                    resolve(subjectsWithProfessors);
-                }, 300);
-            });
-        },
-
-        async getSubjectsByProfessor(professorId) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const subjects = this._tables.subjects.filter(s => s.professorId === professorId);
-                    resolve(subjects);
-                }, 300);
-            });
-        },
-
-        async updateAttendance(studentId, subjectId, newAttendance) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    const enrollment = this._tables.enrollments.find(
-                        e => e.studentId === studentId && e.subjectId === subjectId
-                    );
-                    if (enrollment) {
-                        enrollment.attendance = newAttendance;
-                    }
-                    resolve({ success: true, newAttendance });
                 }, 400);
             });
         }
@@ -492,10 +493,13 @@ nav{
     // UI RENDERING AND DATA FETCHING
     // ============================================
 
+    let allSubjects = []; // Store all subjects for search filtering
+
     async function initializeDashboard() {
         try {
             await loadUserProfile();
             await loadStudentSubjects();
+            setupSearchListener();
         } catch (error) {
             console.error('Error initializing dashboard:', error);
             showError('Failed to load dashboard data. Please refresh the page.');
@@ -535,29 +539,34 @@ nav{
             container.innerHTML = '<div class="loading">Loading your subjects...</div>';
             
             const studentId = parseInt(localStorage.getItem('studentId') || '1');
-            const subjects = await DatabaseService.getStudentSubjects(studentId);
+            allSubjects = await DatabaseService.getStudentSubjects(studentId);
             
-            container.innerHTML = '';
-            
-            if (subjects.length === 0) {
-                container.innerHTML = `
-                    <div class="no-subjects">
-                        <p>You are not enrolled in any subjects yet</p>
-                        <p class="no-subjects-sub">Please contact your registrar for subject enrollment</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            subjects.forEach(subject => {
-                const subjectCard = createSubjectCard(subject);
-                container.appendChild(subjectCard);
-            });
+            renderSubjects(allSubjects);
             
         } catch (error) {
             console.error('Error loading subjects:', error);
             container.innerHTML = '<div class="error-message">Failed to load subjects. Please try again later.</div>';
         }
+    }
+
+    function renderSubjects(subjects) {
+        const container = document.getElementById('subjectsGridContainer');
+        container.innerHTML = '';
+        
+        if (subjects.length === 0) {
+            container.innerHTML = `
+                <div class="no-subjects">
+                    <p>No subjects found</p>
+                    <p class="no-subjects-sub">Try adjusting your search or contact registrar for enrollment</p>
+                </div>
+            `;
+            return;
+        }
+        
+        subjects.forEach(subject => {
+            const subjectCard = createSubjectCard(subject);
+            container.appendChild(subjectCard);
+        });
     }
 
     function createSubjectCard(subject) {
@@ -566,12 +575,13 @@ nav{
         card.setAttribute('data-subject-id', subject.id);
         card.setAttribute('data-subject-code', subject.code);
         
-        const scheduleText = subject.room ? `${subject.schedule} | ${subject.room}` : subject.schedule;
-        
         card.innerHTML = `
             <div class="subject-header">
-                <div class="subject-icon">${subject.icon || subject.code.substring(0, 3)}</div>
-                <div class="subject-name">${subject.name}</div>
+                <div class="subject-icon">${subject.icon || subject.code.substring(0, 2)}</div>
+                <div class="subject-name">
+                    ${subject.name}
+                    <span class="subject-code">${subject.code}</span>
+                </div>
             </div>
             <div class="professor-info">
                 <div class="professor-avatar">${subject.professorInitials || 'PR'}</div>
@@ -580,21 +590,39 @@ nav{
                     <span class="professor-dept">${subject.professorDepartment || ''}</span>
                 </div>
             </div>
-            <div class="subject-details">
-                <span class="schedule">
-                    <span class="schedule-icon">📅</span>
-                    ${scheduleText}
-                </span>
-                <span class="attendance-badge">${subject.attendance}% Attendance</span>
+            <div class="grade-section">
+                <span class="grade-label">Current Grade</span>
+                <span class="grade-value">${subject.grade}</span>
             </div>
         `;
         
-        card.addEventListener('click', function(e) {
-            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') return;
-            console.log(`Navigate to subject: ${subject.id} - ${subject.name}`);
+        card.addEventListener('click', function() {
+            console.log(`Navigate to subject: ${subject.id} - ${subject.name} (Grade: ${subject.grade})`);
+            // Add navigation logic here
         });
         
         return card;
+    }
+
+    function setupSearchListener() {
+        const searchInput = document.getElementById('subjectSearch');
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                renderSubjects(allSubjects);
+                return;
+            }
+            
+            const filtered = allSubjects.filter(subject => 
+                subject.name.toLowerCase().includes(searchTerm) ||
+                subject.code.toLowerCase().includes(searchTerm) ||
+                (subject.professorName && subject.professorName.toLowerCase().includes(searchTerm)) ||
+                subject.grade.toString().includes(searchTerm)  // Search by numerical grade (e.g., 85, 92)
+            );
+            
+            renderSubjects(filtered);
+        });
     }
 
     function showError(message) {
@@ -616,7 +644,7 @@ nav{
     document.addEventListener("click", function(e){
         const profile = document.querySelector(".profile");
         const menu = document.getElementById("profileMenu");
-        if(!profile.contains(e.target) && !menu.contains(e.target)){
+        if(profile && !profile.contains(e.target) && !menu.contains(e.target)){
             menu.classList.remove("active");
         }
     });
@@ -631,29 +659,10 @@ nav{
     });
 
     // ============================================
-    // DATABASE ADMIN FUNCTIONS
-    // ============================================
-
-    window.addEnrollment = async function(studentId, subjectId, attendance = 0) {
-        DatabaseService._tables.enrollments.push({
-            studentId: studentId,
-            subjectId: subjectId,
-            attendance: attendance,
-            currentGrade: 'N/A'
-        });
-        await loadStudentSubjects();
-    };
-
-    window.updateAttendance = async function(studentId, subjectId, newAttendance) {
-        await DatabaseService.updateAttendance(studentId, subjectId, newAttendance);
-        await loadStudentSubjects();
-    };
-
-    // ============================================
     // INITIALIZATION
     // ============================================
 
-    fetch("students_sidebar.html")
+    fetch("sidebar.html")
         .then(r => r.text())
         .then(html => {
             document.getElementById("sidebarContainer").innerHTML = html;
@@ -679,8 +688,17 @@ nav{
         }
     }
 
+    // Expose DatabaseService for debugging
     window.db = DatabaseService;
 </script>
+
+<!-- Database Schema Documentation -->
+<!-- 
+    students: id, fullName, studentId, semester, academicYear
+    professors: id, name, department, email, initials
+    subjects: id, code, name, professorId
+    enrollments: studentId, subjectId, grade (numerical, e.g., 85, 92, 78)
+-->
 
 </body>
 </html>
