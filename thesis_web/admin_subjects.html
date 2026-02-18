@@ -193,10 +193,28 @@ nav{
 
 .legend-wrapper{
     flex:1;
-    min-width:250px;
+    min-width:300px;
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:10px;
+    max-height:400px;
+    overflow-y:auto;
+    padding-right:10px;
+}
+
+/* Custom scrollbar for legend */
+.legend-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.legend-wrapper::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+}
+
+.legend-wrapper::-webkit-scrollbar-thumb {
+    background: #6fe3ff;
+    border-radius: 10px;
 }
 
 .legend-item{
@@ -205,36 +223,46 @@ nav{
     gap:10px;
     color:#dffaff;
     font-size:0.95rem;
-    padding:8px 12px;
+    padding:10px 15px;
     background:rgba(0,20,28,0.4);
     border-radius:8px;
     transition:0.2s;
+    border-left:4px solid transparent;
 }
 
 .legend-item:hover{
     background:rgba(110,243,255,0.1);
     transform:translateX(5px);
+    border-left-color:#6fe3ff;
 }
 
 .legend-color{
     width:20px;
     height:20px;
     border-radius:4px;
+    flex-shrink:0;
 }
 
 .legend-text{
     flex:1;
     display:flex;
     justify-content:space-between;
+    align-items:center;
+    gap:10px;
 }
 
 .legend-label{
     font-weight:500;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:200px;
 }
 
 .legend-value{
     font-weight:600;
     color:#6fe3ff;
+    white-space:nowrap;
 }
 
 /* ================= TABLE CONTAINER ================= */
@@ -387,6 +415,15 @@ nav{
         width:100%;
         max-width:300px;
     }
+    
+    .legend-wrapper{
+        width:100%;
+        max-height:300px;
+    }
+    
+    .legend-label{
+        max-width:150px;
+    }
 }
 
     #sidebarContainer {
@@ -451,13 +488,13 @@ nav{
 
         <!-- Pie Chart Section -->
         <div class="chart-section">
-            <h3 style="color:#6fe3ff; margin-bottom:20px; text-align:center;">Curriculum Unit Distribution</h3>
+            <h3 style="color:#6fe3ff; margin-bottom:20px; text-align:center;">Curriculum Unit Distribution (Descending Order)</h3>
             <div class="chart-container">
                 <div class="chart-wrapper">
                     <canvas id="curriculumPieChart"></canvas>
                 </div>
                 <div class="legend-wrapper" id="legendContainer">
-                    <!-- Legend will be populated by JavaScript -->
+                    <!-- Legend will be populated by JavaScript in descending order -->
                 </div>
             </div>
         </div>
@@ -1113,22 +1150,25 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('navProfileImage').src = savedImage;
     }
     
-    // Initialize pie chart
+    // Initialize pie chart with descending order
     createPieChart();
 });
 
-// Pie Chart Data
-const curriculumData = [
+// Original curriculum data
+const originalData = [
+    { label: 'Professional Courses', value: 86, color: '#96CEB4' },
+    { label: 'General Education Courses', value: 27, color: '#B19CD9' },
     { label: 'Mathematics and Natural/Physical Sciences', value: 23, color: '#FF6B6B' },
+    { label: 'CpE Electives', value: 12, color: '#FFE194' },
+    { label: 'GEC Electives/Mandated courses', value: 12, color: '#FF9F1C' },
     { label: 'Basic Engineering Sciences', value: 10, color: '#4ECDC4' },
     { label: 'Allied Courses', value: 8, color: '#45B7D1' },
-    { label: 'Professional Courses', value: 86, color: '#96CEB4' },
-    { label: 'CpE Electives', value: 12, color: '#FFE194' },
-    { label: 'General Education Courses', value: 27, color: '#B19CD9' },
-    { label: 'GEC Electives/Mandated courses', value: 12, color: '#FF9F1C' },
     { label: 'Physical Education', value: 8, color: '#2E86AB' },
     { label: 'National Service Training Program', value: 6, color: '#A23B72' }
 ];
+
+// Sort data in descending order by value
+const curriculumData = [...originalData].sort((a, b) => b.value - a.value);
 
 function createPieChart() {
     const ctx = document.getElementById('curriculumPieChart').getContext('2d');
@@ -1171,12 +1211,13 @@ function createPieChart() {
         }
     });
     
-    // Create custom legend
+    // Create custom legend in descending order
     createLegend();
 }
 
 function createLegend() {
     const legendContainer = document.getElementById('legendContainer');
+    legendContainer.innerHTML = ''; // Clear existing legend
     const total = curriculumData.reduce((sum, item) => sum + item.value, 0);
     
     curriculumData.forEach(item => {
