@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Subjects Monitoring | ADV-Attendify</title>
+
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ================= BACKGROUND ================= */
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:url("images/backgroundhome.png") center/cover no-repeat fixed;
+}
+
+/* ================= NAVBAR ================= */
+nav{
+    position:fixed;
+    top:0;
+    width:100%;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(0,0,0,0.25);
+    backdrop-filter:blur(8px);
+    z-index:1001;
+}
+
+.menu-btn{
+    font-size:28px;
+    background:none;
+    border:none;
+    color:#6fe3ff;
+    cursor:pointer;
+}
+
+/* ================= PROFILE ICON ================= */
+.profile-wrapper{
+    position:relative;
+}
+
+.profile{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    overflow:hidden;
+    cursor:pointer;
+    border:2px solid #6fe3ff;
+}
+
+.profile img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* ================= PROFILE DROPDOWN ================= */
+.profile-menu{
+    position:absolute;
+    top:55px;
+    right:0;
+    background:#0b2a3a;
+    border-radius:12px;
+    padding:10px 0;
+    min-width:170px;
+    opacity:0;
+    pointer-events:none;
+    transition:0.25s;
+    z-index:1002;
+}
+
+.profile-menu.active{
+    opacity:1;
+    pointer-events:all;
+}
+
+.profile-menu a{
+    display:block;
+    padding:12px 20px;
+    color:#dffaff;
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.profile-menu a:hover{
+    background:#1ea7d7;
+    color:#00141c;
+}
+
+/* ================= HERO SECTION ================= */
+.hero{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:120px 40px 40px;
+}
+
+/* ================= MAIN PANEL ================= */
+.main-panel{
+    width:100%;
+    max-width:1400px;
+    padding:35px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(14px);
+    border-radius:26px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+
+/* ================= HEADER ================= */
+.header-section{
+    text-align:center;
+    margin-bottom:30px;
+    color:#fff;
+}
+
+.header-section h1{
+    font-size:2.5rem;
+    color:#6fe3ff;
+    margin-bottom:10px;
+    text-shadow:0 2px 5px rgba(0,0,0,0.3);
+}
+
+.header-section p{
+    font-size:1.1rem;
+    color:#070808;
+}
+
+/* ================= CURRICULUM INFO ================= */
+.curriculum-info{
+    background:rgba(11,42,58,0.8);
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:30px;
+    color:#dffaff;
+    border:1px solid rgba(110,243,255,0.3);
+}
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(250px, 1fr));
+    gap:15px;
+}
+
+.info-item{
+    padding:10px;
+}
+
+.info-item strong{
+    color:#6fe3ff;
+    display:block;
+    margin-bottom:5px;
+}
+
+/* ================= TABLE CONTAINER ================= */
+.table-container{
+    overflow-x:auto;
+    margin-top:20px;
+    border-radius:16px;
+    background:rgba(0,20,28,0.6);
+    padding:5px;
+}
+
+/* ================= CURRICULUM TABLE ================= */
+.curriculum-table{
+    width:100%;
+    border-collapse:collapse;
+    background:rgba(223,250,255,0.1);
+    border-radius:16px;
+    overflow:hidden;
+    min-width:1000px;
+}
+
+.curriculum-table th{
+    background:#0b2a3a;
+    color:#6fe3ff;
+    font-weight:600;
+    padding:15px 12px;
+    text-align:center;
+    border-bottom:3px solid #6fe3ff;
+    font-size:0.95rem;
+}
+
+.curriculum-table td{
+    padding:12px 10px;
+    color:#dffaff;
+    border-bottom:1px solid rgba(110,243,255,0.2);
+    font-size:0.9rem;
+}
+
+.curriculum-table tbody tr:hover{
+    background:rgba(110,243,255,0.1);
+    transition:0.2s;
+}
+
+/* Year section styling */
+.year-section{
+    background:#1ea7d7 !important;
+    color:#00141c !important;
+    font-weight:700;
+    font-size:1.1rem;
+    text-align:left;
+    padding:12px 15px;
+}
+
+.year-section td{
+    color:#00141c !important;
+    font-weight:700;
+    background:#1ea7d7;
+}
+
+.semester-section{
+    background:rgba(30,167,215,0.3) !important;
+    color:#6fe3ff !important;
+    font-weight:600;
+    font-style:italic;
+    padding:10px 15px;
+}
+
+.semester-section td{
+    color:#6fe3ff !important;
+    font-weight:600;
+    background:rgba(30,167,215,0.3);
+}
+
+/* Code column */
+.code-col{
+    font-family:'Courier New', monospace;
+    font-weight:600;
+    color:#6fe3ff;
+}
+
+/* Units column */
+.units-col{
+    text-align:center;
+    font-weight:600;
+}
+
+/* Prerequisites column */
+.prereq-col{
+    font-size:0.85rem;
+    color:#b0e0ff;
+}
+
+/* Custom SweetAlert2 styling */
+.swal2-popup {
+    background: #0b2a3a !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(110, 243, 255, 0.25) !important;
+}
+
+.swal2-title {
+    color: #6ef3ff !important;
+}
+
+.swal2-html-container {
+    color: #dffaff !important;
+}
+
+.swal2-confirm {
+    background: linear-gradient(135deg, #00f2ff, #7f5cff) !important;
+    color: #020617 !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+}
+
+.swal2-cancel {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #dffaff !important;
+    border: 2px solid #6ef3ff !important;
+    border-radius: 12px !important;
+}
+
+/* ================= SUMMARY SECTION ================= */
+.summary-section{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+    gap:15px;
+    padding:20px;
+    background:rgba(11,42,58,0.8);
+    border-radius:18px;
+    border:1px solid rgba(110,243,255,0.3);
+}
+
+.summary-item{
+    text-align:center;
+    color:#dffaff;
+}
+
+.summary-item .label{
+    font-size:0.9rem;
+    color:#6fe3ff;
+    margin-bottom:5px;
+}
+
+.summary-item .value{
+    font-size:1.8rem;
+    font-weight:700;
+    color:#fff;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width:768px){
+    .hero{
+        padding:100px 20px 20px;
+    }
+    
+    .main-panel{
+        padding:20px;
+    }
+    
+    .header-section h1{
+        font-size:1.8rem;
+    }
+    
+    .curriculum-table{
+        min-width:800px;
+    }
+}
+
+    #sidebarContainer {
+      position: relative;
+      z-index: 1002;
+    }
+</style>
+</head>
+
+<body>
+
+<!-- ===== LOAD SIDEBAR HERE ===== -->
+<div id="sidebarContainer"></div>
+
+<!-- Navbar -->
+<nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <div class="profile-wrapper">
+        <div class="profile" onclick="toggleProfileMenu()">
+            <img src="images/profile.png" id="navProfileImage">
+        </div>
+
+        <div id="profileMenu" class="profile-menu">
+            <a href="admin_profile.html">Edit Profile</a>
+            <a onclick="confirmLogout()">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<section class="hero">
+    <div class="main-panel">
+        
+        <!-- Header -->
+        <div class="header-section">
+            <h1>BS Computer Engineering Curriculum</h1>
+            <p>Effective Academic Year 2024-2025 | Revised 2023 Curriculum</p>
+        </div>
+
+        <!-- Curriculum Info -->
+        <div class="curriculum-info">
+            <div class="info-grid">
+                <div class="info-item">
+                    <strong>University:</strong>
+                    Cagayan State University - Carig Campus
+                </div>
+                <div class="info-item">
+                    <strong>College:</strong>
+                    College of Engineering and Architecture
+                </div>
+                <div class="info-item">
+                    <strong>Program:</strong>
+                    Bachelor of Science in Computer Engineering
+                </div>
+                <div class="info-item">
+                    <strong>Total Units:</strong>
+                    174
+                </div>
+            </div>
+        </div>
+
+        <!-- Curriculum Table -->
+        <div class="table-container">
+            <table class="curriculum-table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Descriptive Title</th>
+                        <th>Lec Hrs</th>
+                        <th>Lab Hrs</th>
+                        <th>Units</th>
+                        <th>Pre-Requisites</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- FIRST YEAR - FIRST SEMESTER -->
+                    <tr class="year-section">
+                        <td colspan="6">FIRST YEAR</td>
+                    </tr>
+                    <tr class="semester-section">
+                        <td colspan="6">First Semester</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">MATH111E</td>
+                        <td>Calculus 1</td>
+                        <td class="units-col">4</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GE Elect 24</td>
+                        <td>Mathematics for Engineers 1</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GE Elect 25</td>
+                        <td>Mathematics for Engineers 2</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CHEM111E</td>
+                        <td>Chemistry for Engineers</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE111</td>
+                        <td>Computer Engineering as a Discipline</td>
+                        <td class="units-col">1</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">1</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC108</td>
+                        <td>Readings in Phil. History</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC109</td>
+                        <td>Understanding the Self</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">PE11</td>
+                        <td>PATHFit 1 (Movement Competency Training)</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">2</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">NSTP11</td>
+                        <td>NSTP 1</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+
+                    <!-- FIRST YEAR - SECOND SEMESTER -->
+                    <tr class="semester-section">
+                        <td colspan="6">Second Semester</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">MATH121E</td>
+                        <td>Calculus 2</td>
+                        <td class="units-col">4</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Calculus 1, Mathematics for Engineers 1 & 2</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">PHY121E</td>
+                        <td>Physics for Engineers</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Calculus 1</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE121</td>
+                        <td>Programming Logic & Design</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">6</td>
+                        <td class="units-col">2</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC101</td>
+                        <td>Art Appreciation</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC102</td>
+                        <td>Mathematics in the Modern World</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC103</td>
+                        <td>Science, Technology and Society</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC104</td>
+                        <td>The Contemporary World</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">PE12</td>
+                        <td>PATHFit 2 (Exercise-based Fitness Activities)</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">2</td>
+                        <td class="prereq-col">PATHFit 1</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">NSTP12</td>
+                        <td>NSTP 2</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">NSTP 1</td>
+                    </tr>
+
+                    <!-- SECOND YEAR - FIRST SEMESTER -->
+                    <tr class="year-section">
+                        <td colspan="6">SECOND YEAR</td>
+                    </tr>
+                    <tr class="semester-section">
+                        <td colspan="6">First Semester</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">MATH211E</td>
+                        <td>Differential Equations</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Calculus 2</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">STAT</td>
+                        <td>Engineering Data Analysis</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Calculus 1</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE211</td>
+                        <td>Data Structures and Algorithm Analysis</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">6</td>
+                        <td class="units-col">2</td>
+                        <td class="prereq-col">Programming Logic and Design</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE212</td>
+                        <td>Discrete Mathematics</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Calculus 1</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">EE211</td>
+                        <td>Fundamental of Electrical Circuits</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Physics for Engineers</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">ECE211</td>
+                        <td>Fundamentals of Electronic Circuits</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Physics for Engineers</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">PE13</td>
+                        <td>PATHFit 3 (Choice of Dance, Sports, Martial Arts, Group Exercise, Outdoor and Adventure Activities)</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">2</td>
+                        <td class="prereq-col">PATHFit 2</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC105</td>
+                        <td>Life and Works of Rizal</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+
+                    <!-- SECOND YEAR - SECOND SEMESTER -->
+                    <tr class="semester-section">
+                        <td colspan="6">Second Semester</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE221</td>
+                        <td>Advance Engineering Math for CPE</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Differential Equations</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CpE222</td>
+                        <td>Database Management System</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Data Structures and Algorithm Analysis</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE223</td>
+                        <td>Logic Circuits and Design</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Fundamentals of Electronic Circuits</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE224</td>
+                        <td>Object-Oriented Programming</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">6</td>
+                        <td class="units-col">2</td>
+                        <td class="prereq-col">Programming Logic & Design</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC106</td>
+                        <td>Ethics</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC107</td>
+                        <td>Purposive Communication</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">None</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">ES001</td>
+                        <td>Computer-Aided Drafting</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">1</td>
+                        <td class="prereq-col">2nd year standing*</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">ES002</td>
+                        <td>Engineering Economics</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">2nd year standing*</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">PE14</td>
+                        <td>PATHFit 4 (Choice of Dance, Sports, Martial Arts, Group Exercise, Outdoor and Adventure Activities)</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">2</td>
+                        <td class="prereq-col">PATHFit 3</td>
+                    </tr>
+
+                    <!-- THIRD YEAR - FIRST SEMESTER -->
+                    <tr class="year-section">
+                        <td colspan="6">THIRD YEAR</td>
+                    </tr>
+                    <tr class="semester-section">
+                        <td colspan="6">First Semester</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE311</td>
+                        <td>Operating Systems</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Data Structures and Algorithm Analysis</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE312</td>
+                        <td>Introduction to HDL</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">1</td>
+                        <td class="prereq-col">Programming and Logic Design; Fundamentals of Electronic Circuits</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE313</td>
+                        <td>Feedback and Control Systems</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Numerical Methods (co-req); Fundamentals of Electronic Circuits</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE314</td>
+                        <td>Microprocessors</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Logic Circuits and Design</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE315</td>
+                        <td>Computer Engineering Drafting and Design</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">1</td>
+                        <td class="prereq-col">Fundamentals of Electronic Circuits</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE316</td>
+                        <td>Software Design</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Data Structures and Algorithm Analysis; Database Management System; Object-oriented Programming</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE317</td>
+                        <td>Numerical Methods</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Advance Engineering Math</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">GEC Elect26</td>
+                        <td>Introduction to Literature</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">3rd year standing*</td>
+                    </tr>
+
+                    <!-- THIRD YEAR - SECOND SEMESTER -->
+                    <tr class="semester-section">
+                        <td colspan="6">Second Semester</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE321</td>
+                        <td>Basic Occupational Health and Safety</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">3rd year standing*</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE322</td>
+                        <td>Computer Architecture and Organization</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Microprocessors</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE323</td>
+                        <td>Methods of Research</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Engineering Data Analysis; Technical Communication</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE324</td>
+                        <td>Data and Digital Communications</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Fundamentals of Electronic Circuits</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE325</td>
+                        <td>Fundamentals of Mixed Signals and Sensors</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Fundamentals of Electronic Circuits</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE326</td>
+                        <td>Embedded Systems 1</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Microprocessors</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE327</td>
+                        <td>CpE Elective 1**</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Software Design, 3rd year standing*</td>
+                    </tr>
+
+                    <!-- THIRD YEAR - SUMMER -->
+                    <tr class="semester-section">
+                        <td colspan="6">Summer</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE OJT</td>
+                        <td>On the Job Training</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">240</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">3rd year standing*</td>
+                    </tr>
+
+                    <!-- FOURTH YEAR - FIRST SEMESTER -->
+                    <tr class="year-section">
+                        <td colspan="6">FOURTH YEAR</td>
+                    </tr>
+                    <tr class="semester-section">
+                        <td colspan="6">First Semester</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE411</td>
+                        <td>Computer Networks and Security</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Data and Digital Communications</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE412</td>
+                        <td>CpE Laws and Professional Practice</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">2</td>
+                        <td class="prereq-col">4th year standing*</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE413</td>
+                        <td>CpE Practice and Design 1</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">1</td>
+                        <td class="prereq-col">Microprocessors; Methods of Research</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE414</td>
+                        <td>Digital Signal Processing</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">Feedback and Control Systems</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE415</td>
+                        <td>Embedded Systems 2</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">Embedded Systems 1</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE416</td>
+                        <td>CpE Elective 2**</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">CpE Elective 1</td>
+                    </tr>
+
+                    <!-- FOURTH YEAR - SECOND SEMESTER -->
+                    <tr class="semester-section">
+                        <td colspan="6">Second Semester</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE421</td>
+                        <td>CpE Practice and Design 2</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">6</td>
+                        <td class="units-col">2</td>
+                        <td class="prereq-col">CpE Practice and Design 1</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE422</td>
+                        <td>Seminars and Field Trips</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">1</td>
+                        <td class="prereq-col">4th year standing*</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE423</td>
+                        <td>Emerging Technologies in CpE</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">0</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">4th year standing*</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">CPE424</td>
+                        <td>CpE Elective 3**</td>
+                        <td class="units-col">2</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="prereq-col">CpE Elective 2</td>
+                    </tr>
+                    <tr>
+                        <td class="code-col">ES004</td>
+                        <td>Technopreneurship 101</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">3</td>
+                        <td class="units-col">4</td>
+                        <td class="prereq-col">4th year standing*</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <div class="summary-item">
+                <div class="label">Mathematics and Natural/Physical Sciences</div>
+                <div class="value">23 units</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Basic Engineering Sciences</div>
+                <div class="value">10 units</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Allied Courses</div>
+                <div class="value">8 units</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Professional Courses</div>
+                <div class="value">86 units</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">CpE Electives</div>
+                <div class="value">12 units</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">General Education Courses</div>
+                <div class="value">27 units</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">GEC Electives/Mandated courses</div>
+                <div class="value">12 units</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">Physical Education</div>
+                <div class="value">8 units</div>
+            </div>
+            <div class="summary-item">
+                <div class="label">National Service Training Program</div>
+                <div class="value">6 units</div>
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.3); border-radius:12px; color:#b0e0ff; font-size:0.85rem;">
+            <p><strong>*Notes:</strong></p>
+            <p>• 2nd Year standing means the student has completed at least 75% load requirements of the previous level</p>
+            <p>• 3rd Year standing means the student has completed at least 75% load requirements of the previous level</p>
+            <p>• 4th Year standing means the student has completed at least 75% load requirements of the previous level</p>
+            <p>• Load requirement means number of subjects/courses passed</p>
+            <p>• **The courses in track specializations should be related</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    /* ===== load sidebar component ===== */
+    fetch("admin_sidebar.html")
+    .then(r => r.text())
+    .then(html => {
+        document.getElementById("sidebarContainer").innerHTML = html;
+        // Initialize sidebar after it's loaded
+        initializeSidebar();
+    });
+
+    function initializeSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("overlay");
+    
+    if (sidebar && overlay) {
+        window.toggleMenu = function(){
+            sidebar.classList.toggle("active");
+            overlay.classList.toggle("active");
+        };
+        
+        overlay.onclick = toggleMenu;
+    }
+}
+
+// Logout confirmation function
+function confirmLogout() {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You will be logged out of your account!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#00f2ff',
+        cancelButtonColor: '#ff6b6b',
+        confirmButtonText: 'Yes, logout',
+        cancelButtonText: 'Cancel',
+        background: '#0b2a3a',
+        color: '#dffaff'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Clear all user data from localStorage
+            localStorage.clear();
+            
+            Swal.fire({
+                title: 'Logged Out!',
+                text: 'You have been successfully logged out.',
+                icon: 'success',
+                confirmButtonColor: '#00f2ff',
+                background: '#0b2a3a',
+                color: '#dffaff'
+            }).then(() => {
+                // Redirect to login page
+                window.location.href = 'login.html';
+            });
+        }
+    });
+}
+
+// Load profile data from localStorage
+document.addEventListener('DOMContentLoaded', function() {
+    // Load profile images
+    const savedImage = localStorage.getItem('profileImage');
+    if (savedImage) {
+        document.getElementById('navProfileImage').src = savedImage;
+    }
+});
+
+/* profile dropdown */
+function toggleProfileMenu(){
+    const profileMenu = document.getElementById("profileMenu");
+    profileMenu.classList.toggle("active");
+}
+
+document.addEventListener("click", function(e){
+    const profile = document.querySelector(".profile");
+    const menu = document.getElementById("profileMenu");
+    if(!profile.contains(e.target) && !menu.contains(e.target)){
+        menu.classList.remove("active");
+    }
+});
+
+// Listen for storage changes to update profile in real-time
+window.addEventListener('storage', function(e) {
+    if (e.key === 'profileImage') {
+        document.getElementById('navProfileImage').src = e.newValue;
+    }
+});
+</script>
+
+</body>
+</html>
