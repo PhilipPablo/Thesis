@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Admin Home | ADV-Attendify</title>
+<title>Professors Home | ADV-Attendify</title>
 
 <!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -97,7 +97,6 @@ nav{
     opacity:0;
     pointer-events:none;
     transition:0.25s;
-    z-index:1002;
 }
 
 .profile-menu.active{
@@ -119,7 +118,7 @@ nav{
 }
 
 /* ================= STUDENT CARD ================= */
-.admin-card{
+.student-card{
     display:flex;
     gap:45px;
     align-items:center;
@@ -127,7 +126,7 @@ nav{
 }
 
 /* LEFT */
-.admin-left{
+.student-left{
     width:300px;
     display:flex;
     flex-direction:column;
@@ -135,7 +134,7 @@ nav{
     gap:25px;
 }
 
-.admin-photo{
+.student-photo{
     width:170px;
     height:170px;
     border-radius:50%;
@@ -170,7 +169,7 @@ nav{
 }
 
 /* RIGHT */
-.admin-right{
+.student-right{
     flex:1;
 }
 
@@ -192,6 +191,20 @@ nav{
 
 .course{
     margin:2% 0 3%;
+}
+
+/* TEXTAREA RESPONSIVE */
+.about-box{
+    background:#dffaff;
+    width:100%;
+    max-width:800px;
+    min-height:210px;
+    border-radius:22px;
+    padding:25px;
+    font-size:1rem;
+    font-style:italic;
+    color:#444;
+    resize:none;
 }
 
 /* Custom SweetAlert2 styling */
@@ -223,21 +236,27 @@ nav{
     border-radius: 12px !important;
 }
 
+/* ================= RESPONSIVE ================= */
 @media (max-width:1100px){
-    .admin-card{
+    .student-card{
         flex-direction:column;
         text-align:center;
     }
     .divider{ display:none; }
-    .admin-left,
-    .admin-right{ width:100%; }
+    .student-left,
+    .student-right{ width:100%; }
+}
+
+@media (max-width:600px){
+    .main-panel{ padding:25px; }
+    .about-box{ min-height:160px; padding:18px; }
 }
 
     #sidebarContainer {
       position: relative;
       z-index: 1002;
     }
-
+    
 </style>
 </head>
 
@@ -256,7 +275,8 @@ nav{
         </div>
 
         <div id="profileMenu" class="profile-menu">
-            <a href="admin_profile.html">Edit Profile</a>
+            <a href="teachers_profile.html">Edit Profile</a>
+            <a href="#">Settings</a>
             <a onclick="confirmLogout()">Logout</a>
         </div>
     </div>
@@ -264,10 +284,10 @@ nav{
 
 <!-- STUDENT PANEL -->
 <section class="hero">
-    <div class="main-panel admin-card">
+    <div class="main-panel student-card">
 
-        <div class="admin-left">
-            <img src="images/profile2.png" id="mainProfileImage" class="admin-photo">
+        <div class="student-left">
+            <img src="images/profile2.png" id="mainProfileImage" class="student-photo">
             <div class="name-pill" id="fullNameDisplay">Full Name</div>
 
             <div class="esign">
@@ -278,7 +298,7 @@ nav{
 
         <div class="divider"></div>
 
-        <div class="admin-right">
+        <div class="student-right">
 
             <div class="school-header">
                 <div class="logos">
@@ -291,6 +311,14 @@ nav{
                 <p>College of Engineering and Architecture</p>
             </div>
 
+            <p class="course">
+                Bachelor of Science in Computer Engineering<br>
+               
+            </p>
+
+            <textarea id="aboutInput" class="about-box"
+                placeholder="About me... (Press Enter to save)"></textarea>
+
         </div>
     </div>
 </section>
@@ -300,7 +328,7 @@ nav{
 
 <script>
     /* ===== load sidebar component ===== */
-    fetch("admin_sidebar.html")
+    fetch("teachers_sidebar.html")
     .then(r => r.text())
     .then(html => {
         document.getElementById("sidebarContainer").innerHTML = html;
@@ -381,6 +409,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedAbout = localStorage.getItem('aboutText');
     if (savedAbout) {
         document.getElementById('aboutInput').value = savedAbout;
+    }
+});
+    
+/* ===== about me save ===== */
+const aboutInput = document.getElementById("aboutInput");
+
+aboutInput.value = localStorage.getItem("aboutText") || "";
+
+aboutInput.addEventListener("keydown", function(e){
+    if(e.key === "Enter"){
+        e.preventDefault();
+        localStorage.setItem("aboutText", aboutInput.value);
+        aboutInput.blur();
+        
+        // Show success message with SweetAlert
+        Swal.fire({
+            title: 'Saved!',
+            text: 'Your about me section has been updated.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+            background: '#0b2a3a',
+            color: '#dffaff'
+        });
     }
 });
 
