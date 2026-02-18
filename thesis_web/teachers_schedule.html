@@ -235,6 +235,36 @@
             min-width: 150px;
         }
 
+        .late-settings {
+            background: rgba(26, 58, 70, 0.5);
+            border-radius: 24px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px dashed #3f92b0;
+        }
+
+        .late-settings h3 {
+            color: #6fe3ff;
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 15px;
+        }
+
+        .late-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .late-input-group .form-control {
+            width: 100px;
+            text-align: center;
+        }
+
+        .late-input-group span {
+            color: #9bbaca;
+        }
+
         .btn-primary {
             background: #1ea7d7;
             border: none;
@@ -309,6 +339,7 @@
         .schedule-info p {
             color: #9bbaca;
             font-size: 0.95rem;
+            margin: 2px 0;
         }
 
         .schedule-time {
@@ -317,6 +348,17 @@
             border-radius: 30px;
             border: 1px solid #3b7a94;
             font-size: 0.95rem;
+        }
+
+        .late-badge {
+            background: #854d30;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            border: 1px solid #c46b3f;
+            color: #ffd6b3;
+            display: inline-block;
+            margin-top: 5px;
         }
 
         .delete-schedule {
@@ -417,6 +459,48 @@
                 <input type="date" id="scheduleDate" class="form-control" required>
             </div>
 
+            <!-- Year and Section fields -->
+            <div class="time-row">
+                <div class="time-col">
+                    <div class="form-group">
+                        <label>Year</label>
+                        <select id="yearSelect" class="form-control" required>
+                            <option value="">-- Select year --</option>
+                            <option value="1st Year">1st Year</option>
+                            <option value="2nd Year">2nd Year</option>
+                            <option value="3rd Year">3rd Year</option>
+                            <option value="4th Year">4th Year</option>
+                            <option value="5th Year">5th Year</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="time-col">
+                    <div class="form-group">
+                        <label>Section</label>
+                        <select id="sectionSelect" class="form-control" required>
+                            <option value="">-- Select section --</option>
+                            <option value="A">Section A</option>
+                            <option value="B">Section B</option>
+                            <option value="C">Section C</option>
+                            <option value="D">Section D</option>
+                            <option value="E">Section E</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Late Time Settings -->
+            <div class="late-settings">
+                <h3>Late Attendance Settings</h3>
+                <div class="late-input-group">
+                    <input type="number" id="lateMinutes" class="form-control" min="1" max="120" value="15" required>
+                    <span>minutes after start time is considered LATE</span>
+                </div>
+                <p style="color: #9bbaca; font-size: 0.85rem; margin-top: 10px;">
+                    Students arriving after this grace period will be marked as late
+                </p>
+            </div>
+
             <button type="submit" class="btn-primary">Create Schedule</button>
         </form>
     </div>
@@ -513,15 +597,35 @@
         return `${hour12}:${minutes} ${ampm}`;
     }
 
+    // Calculate late time based on start time and late minutes
+    function calculateLateTime(startTime, lateMinutes) {
+        const [hours, minutes] = startTime.split(':').map(Number);
+        let totalMinutes = hours * 60 + minutes + parseInt(lateMinutes);
+        
+        const newHours = Math.floor(totalMinutes / 60) % 24;
+        const newMinutes = totalMinutes % 60;
+        
+        return `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
+    }
+
+    // Format late time for display
+    function formatLateTime(startTime, lateMinutes) {
+        const lateTime = calculateLateTime(startTime, lateMinutes);
+        return formatTime(lateTime);
+    }
+
     // Create new schedule
     function createSchedule() {
         const subjectId = document.getElementById('subjectSelect').value;
         const startTime = document.getElementById('startTime').value;
         const endTime = document.getElementById('endTime').value;
         const date = document.getElementById('scheduleDate').value;
+        const year = document.getElementById('yearSelect').value;
+        const section = document.getElementById('sectionSelect').value;
+        const lateMinutes = document.getElementById('lateMinutes').value;
 
         // Validation
-        if (!subjectId || !startTime || !endTime || !date) {
+        if (!subjectId || !startTime || !endTime || !date || !year || !section || !lateMinutes) {
             alert('Please fill in all fields');
             return;
         }
@@ -529,6 +633,9 @@
         // Find subject details
         const subject = testSubjects.find(s => s.id === subjectId);
         if (!subject) return;
+
+        // Calculate late threshold time
+        const lateThreshold = calculateLateTime(startTime, lateMinutes);
 
         // Create schedule object
         const newSchedule = {
@@ -539,6 +646,10 @@
             startTime: startTime,
             endTime: endTime,
             date: date,
+            year: year,
+            section: section,
+            lateMinutes: parseInt(lateMinutes),
+            lateThreshold: lateThreshold,
             createdAt: new Date().toISOString()
         };
 
@@ -547,6 +658,10 @@
 
         // Clear form
         document.getElementById('scheduleForm').reset();
+
+        // Set default date back to today and default late minutes to 15
+        setDefaultDate();
+        document.getElementById('lateMinutes').value = '15';
 
         // Refresh display
         displaySchedules();
@@ -579,11 +694,16 @@
 
             const startFormatted = formatTime(schedule.startTime);
             const endFormatted = formatTime(schedule.endTime);
+            const lateThresholdFormatted = formatTime(schedule.lateThreshold);
 
             scheduleCard.innerHTML = `
                 <div class="schedule-info">
                     <h3>${schedule.subjectName} (${schedule.subjectCode})</h3>
                     <p>${formattedDate}</p>
+                    <p>${schedule.year} - Section ${schedule.section}</p>
+                    <div class="late-badge">
+                        Late after: ${lateThresholdFormatted} (${schedule.lateMinutes} min grace)
+                    </div>
                 </div>
                 <div class="schedule-time">
                     ${startFormatted} - ${endFormatted}
@@ -616,6 +736,9 @@
         setDefaultDate();
         displaySchedules();
 
+        // Set default late minutes to 15
+        document.getElementById('lateMinutes').value = '15';
+
         // Close profile menu on outside click
         window.addEventListener('click', function(e) {
             const profileMenu = document.getElementById('profileMenu');
@@ -632,4 +755,3 @@
 
 </body>
 </html>
-
