@@ -380,7 +380,7 @@
         <img src="images/profile.png" alt="profile" id="navProfileImage">
       </div>
       <div id="profileMenu" class="profile-menu">
-        <a href="edit_profile.html">Edit Profile</a>
+        <a href="students_profile.html">Edit Profile</a>
         <a href="#">Settings</a>
         <a href="login.html">Logout</a>
       </div>
@@ -436,7 +436,7 @@
 
   <script>
     // ===== SIDEBAR & PROFILE FUNCTIONS (preserved) =====
-    fetch("sidebar.html")
+    fetch("students_sidebar.html")
       .then(r => r.text())
       .then(html => {
         document.getElementById("sidebarContainer").innerHTML = html;
