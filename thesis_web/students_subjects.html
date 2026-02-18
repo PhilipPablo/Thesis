@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Home | ADV-Attendify</title>
+<title>Students Subject | ADV-Attendify</title>
 
 <style>
 *{
@@ -358,6 +358,16 @@ nav{
         max-width: 100%;
     }
 }
+
+.profile-wrapper {
+      position: relative;
+    }
+
+    #sidebarContainer {
+      position: relative;
+      z-index: 1002;
+    }
+
 </style>
 </head>
 <body>
@@ -373,7 +383,7 @@ nav{
         </div>
 
         <div id="profileMenu" class="profile-menu">
-            <a href="edit_profile.html">Edit Profile</a>
+            <a href="students_profile.html">Edit Profile</a>
             <a href="#">Settings</a>
             <a href="login.html">Logout</a>
         </div>
@@ -662,7 +672,7 @@ nav{
     // INITIALIZATION
     // ============================================
 
-    fetch("sidebar.html")
+    fetch("students_sidebar.html")
         .then(r => r.text())
         .then(html => {
             document.getElementById("sidebarContainer").innerHTML = html;
