@@ -8,6 +8,9 @@
 <!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
+<!-- Chart.js for Pie Chart -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
 <style>
 *{
     margin:0;
@@ -163,6 +166,77 @@ nav{
     margin-bottom:5px;
 }
 
+/* ================= CHART SECTION ================= */
+.chart-section{
+    background:rgba(11,42,58,0.8);
+    border-radius:18px;
+    padding:25px;
+    margin-bottom:30px;
+    border:1px solid rgba(110,243,255,0.3);
+}
+
+.chart-container{
+    display:flex;
+    flex-wrap:wrap;
+    gap:30px;
+    align-items:center;
+    justify-content:center;
+}
+
+.chart-wrapper{
+    flex:1;
+    min-width:300px;
+    max-width:400px;
+    height:300px;
+    position:relative;
+}
+
+.legend-wrapper{
+    flex:1;
+    min-width:250px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.legend-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#dffaff;
+    font-size:0.95rem;
+    padding:8px 12px;
+    background:rgba(0,20,28,0.4);
+    border-radius:8px;
+    transition:0.2s;
+}
+
+.legend-item:hover{
+    background:rgba(110,243,255,0.1);
+    transform:translateX(5px);
+}
+
+.legend-color{
+    width:20px;
+    height:20px;
+    border-radius:4px;
+}
+
+.legend-text{
+    flex:1;
+    display:flex;
+    justify-content:space-between;
+}
+
+.legend-label{
+    font-weight:500;
+}
+
+.legend-value{
+    font-weight:600;
+    color:#6fe3ff;
+}
+
 /* ================= TABLE CONTAINER ================= */
 .table-container{
     overflow-x:auto;
@@ -282,33 +356,9 @@ nav{
     border-radius: 12px !important;
 }
 
-/* ================= SUMMARY SECTION ================= */
+/* ================= SUMMARY SECTION (OLD - HIDDEN) ================= */
 .summary-section{
-    margin-top:30px;
-    display:grid;
-    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
-    gap:15px;
-    padding:20px;
-    background:rgba(11,42,58,0.8);
-    border-radius:18px;
-    border:1px solid rgba(110,243,255,0.3);
-}
-
-.summary-item{
-    text-align:center;
-    color:#dffaff;
-}
-
-.summary-item .label{
-    font-size:0.9rem;
-    color:#6fe3ff;
-    margin-bottom:5px;
-}
-
-.summary-item .value{
-    font-size:1.8rem;
-    font-weight:700;
-    color:#fff;
+    display:none;
 }
 
 /* ================= RESPONSIVE ================= */
@@ -327,6 +377,15 @@ nav{
     
     .curriculum-table{
         min-width:800px;
+    }
+    
+    .chart-container{
+        flex-direction:column;
+    }
+    
+    .chart-wrapper{
+        width:100%;
+        max-width:300px;
     }
 }
 
@@ -386,6 +445,19 @@ nav{
                 <div class="info-item">
                     <strong>Total Units:</strong>
                     174
+                </div>
+            </div>
+        </div>
+
+        <!-- Pie Chart Section -->
+        <div class="chart-section">
+            <h3 style="color:#6fe3ff; margin-bottom:20px; text-align:center;">Curriculum Unit Distribution</h3>
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <canvas id="curriculumPieChart"></canvas>
+                </div>
+                <div class="legend-wrapper" id="legendContainer">
+                    <!-- Legend will be populated by JavaScript -->
                 </div>
             </div>
         </div>
@@ -960,46 +1032,6 @@ nav{
             </table>
         </div>
 
-        <!-- Summary Section -->
-        <div class="summary-section">
-            <div class="summary-item">
-                <div class="label">Mathematics and Natural/Physical Sciences</div>
-                <div class="value">23 units</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">Basic Engineering Sciences</div>
-                <div class="value">10 units</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">Allied Courses</div>
-                <div class="value">8 units</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">Professional Courses</div>
-                <div class="value">86 units</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">CpE Electives</div>
-                <div class="value">12 units</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">General Education Courses</div>
-                <div class="value">27 units</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">GEC Electives/Mandated courses</div>
-                <div class="value">12 units</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">Physical Education</div>
-                <div class="value">8 units</div>
-            </div>
-            <div class="summary-item">
-                <div class="label">National Service Training Program</div>
-                <div class="value">6 units</div>
-            </div>
-        </div>
-
         <!-- Notes Section -->
         <div style="margin-top:20px; padding:15px; background:rgba(0,0,0,0.3); border-radius:12px; color:#b0e0ff; font-size:0.85rem;">
             <p><strong>*Notes:</strong></p>
@@ -1080,7 +1112,89 @@ document.addEventListener('DOMContentLoaded', function() {
     if (savedImage) {
         document.getElementById('navProfileImage').src = savedImage;
     }
+    
+    // Initialize pie chart
+    createPieChart();
 });
+
+// Pie Chart Data
+const curriculumData = [
+    { label: 'Mathematics and Natural/Physical Sciences', value: 23, color: '#FF6B6B' },
+    { label: 'Basic Engineering Sciences', value: 10, color: '#4ECDC4' },
+    { label: 'Allied Courses', value: 8, color: '#45B7D1' },
+    { label: 'Professional Courses', value: 86, color: '#96CEB4' },
+    { label: 'CpE Electives', value: 12, color: '#FFE194' },
+    { label: 'General Education Courses', value: 27, color: '#B19CD9' },
+    { label: 'GEC Electives/Mandated courses', value: 12, color: '#FF9F1C' },
+    { label: 'Physical Education', value: 8, color: '#2E86AB' },
+    { label: 'National Service Training Program', value: 6, color: '#A23B72' }
+];
+
+function createPieChart() {
+    const ctx = document.getElementById('curriculumPieChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: curriculumData.map(item => item.label),
+            datasets: [{
+                data: curriculumData.map(item => item.value),
+                backgroundColor: curriculumData.map(item => item.color),
+                borderColor: 'rgba(255,255,255,0.2)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false // Hide default legend, we'll use custom one
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((value / total) * 100).toFixed(1);
+                            return `${label}: ${value} units (${percentage}%)`;
+                        }
+                    },
+                    backgroundColor: '#0b2a3a',
+                    titleColor: '#6fe3ff',
+                    bodyColor: '#dffaff',
+                    borderColor: '#6fe3ff',
+                    borderWidth: 1
+                }
+            }
+        }
+    });
+    
+    // Create custom legend
+    createLegend();
+}
+
+function createLegend() {
+    const legendContainer = document.getElementById('legendContainer');
+    const total = curriculumData.reduce((sum, item) => sum + item.value, 0);
+    
+    curriculumData.forEach(item => {
+        const percentage = ((item.value / total) * 100).toFixed(1);
+        
+        const legendItem = document.createElement('div');
+        legendItem.className = 'legend-item';
+        legendItem.innerHTML = `
+            <div class="legend-color" style="background-color: ${item.color};"></div>
+            <div class="legend-text">
+                <span class="legend-label">${item.label}</span>
+                <span class="legend-value">${item.value} units (${percentage}%)</span>
+            </div>
+        `;
+        
+        legendContainer.appendChild(legendItem);
+    });
+}
 
 /* profile dropdown */
 function toggleProfileMenu(){
