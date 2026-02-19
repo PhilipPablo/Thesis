@@ -5,6 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Student Attendance | ADV-Attendify</title>
 
+  <!-- Favicon - Add this line -->
+  <link rel="icon" type="image/png" href="images/websitelogo.png">
+
+  <!-- SweetAlert2 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
   <style>
     /* ===== ORIGINAL STYLES (fully preserved) ===== */
     *{
@@ -366,6 +372,35 @@
       background: rgba(6, 28, 37, 0.5);
       border-radius: 24px;
     }
+
+    /* Custom SweetAlert2 styling */
+    .swal2-popup {
+        background: #0b2a3a !important;
+        border-radius: 22px !important;
+        border: 1px solid rgba(110, 243, 255, 0.25) !important;
+    }
+
+    .swal2-title {
+        color: #6ef3ff !important;
+    }
+
+    .swal2-html-container {
+        color: #dffaff !important;
+    }
+
+    .swal2-confirm {
+        background: linear-gradient(135deg, #00f2ff, #7f5cff) !important;
+        color: #020617 !important;
+        font-weight: 600 !important;
+        border-radius: 12px !important;
+    }
+
+    .swal2-cancel {
+        background: rgba(255, 255, 255, 0.15) !important;
+        color: #dffaff !important;
+        border: 2px solid #6ef3ff !important;
+        border-radius: 12px !important;
+    }
   </style>
 </head>
 <body>
@@ -382,7 +417,7 @@
       <div id="profileMenu" class="profile-menu">
         <a href="students_profile.html">Edit Profile</a>
         <a href="#">Settings</a>
-        <a href="login.html">Logout</a>
+        <a href="#" onclick="confirmLogout(); return false;">Logout</a>
       </div>
     </div>
   </nav>
@@ -434,6 +469,9 @@
   <!-- overlay for sidebar -->
   <div id="overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); backdrop-filter:blur(3px); z-index:999; opacity:0; pointer-events:none; transition:0.25s;" onclick="toggleMenu()"></div>
 
+  <!-- SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script>
     // ===== SIDEBAR & PROFILE FUNCTIONS (preserved) =====
     fetch("students_sidebar.html")
@@ -443,7 +481,7 @@
         initializeSidebar();
       })
       .catch(err => {
-        console.warn("sidebar.html not found – using fallback.");
+        console.warn("students_sidebar.html not found – using fallback.");
         let dummySidebar = document.createElement('div');
         dummySidebar.id = 'sidebar';
         dummySidebar.style.display = 'none';
@@ -467,6 +505,39 @@
       } else {
         window.toggleMenu = function() { console.log("sidebar not loaded"); };
       }
+    }
+
+    // Logout confirmation function
+    function confirmLogout() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out of your account!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#00f2ff',
+            cancelButtonColor: '#ff6b6b',
+            confirmButtonText: 'Yes, logout',
+            cancelButtonText: 'Cancel',
+            background: '#0b2a3a',
+            color: '#dffaff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Clear all user data from localStorage
+                localStorage.clear();
+                
+                Swal.fire({
+                    title: 'Logged Out!',
+                    text: 'You have been successfully logged out.',
+                    icon: 'success',
+                    confirmButtonColor: '#00f2ff',
+                    background: '#0b2a3a',
+                    color: '#dffaff'
+                }).then(() => {
+                    // Redirect to login page
+                    window.location.href = 'login.html';
+                });
+            }
+        });
     }
 
     // Profile functions
@@ -671,4 +742,3 @@
   </script>
 </body>
 </html>
-
