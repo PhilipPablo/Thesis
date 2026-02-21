@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Professors Monitoring | ADV-Attendify</title>
+
+<!-- SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ================= BACKGROUND ================= */
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:url("images/backgroundhome.png") center/cover no-repeat fixed;
+}
+
+/* ================= NAVBAR ================= */
+nav{
+    position:fixed;
+    top:0;
+    width:100%;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:rgba(0,0,0,0.25);
+    backdrop-filter:blur(8px);
+    z-index:1001;
+}
+
+.menu-btn{
+    font-size:28px;
+    background:none;
+    border:none;
+    color:#6fe3ff;
+    cursor:pointer;
+}
+
+/* ================= PROFILE ICON ================= */
+.profile-wrapper{
+    position:relative;
+}
+
+.profile{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    overflow:hidden;
+    cursor:pointer;
+    border:2px solid #6fe3ff;
+}
+
+.profile img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+/* ================= PROFILE DROPDOWN ================= */
+.profile-menu{
+    position:absolute;
+    top:55px;
+    right:0;
+    background:#0b2a3a;
+    border-radius:12px;
+    padding:10px 0;
+    min-width:170px;
+    opacity:0;
+    pointer-events:none;
+    transition:0.25s;
+    z-index:1002;
+}
+
+.profile-menu.active{
+    opacity:1;
+    pointer-events:all;
+}
+
+.profile-menu a{
+    display:block;
+    padding:12px 20px;
+    color:#dffaff;
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.profile-menu a:hover{
+    background:#1ea7d7;
+    color:#00141c;
+}
+
+/* ================= HERO SECTION ================= */
+.hero{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:120px 40px 40px;
+}
+
+/* ================= MAIN PANEL ================= */
+.main-panel{
+    width:100%;
+    max-width:1400px;
+    padding:35px;
+    background:rgba(255,255,255,0.15);
+    backdrop-filter:blur(14px);
+    border-radius:26px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+
+/* ================= HEADER ================= */
+.header-section{
+    text-align:center;
+    margin-bottom:30px;
+    color:#fff;
+}
+
+.header-section h1{
+    font-size:2.5rem;
+    color:#6fe3ff;
+    margin-bottom:10px;
+    text-shadow:0 2px 5px rgba(0,0,0,0.3);
+}
+
+.header-section p{
+    font-size:1.1rem;
+    color:#070808;
+}
+
+/* ================= FILTER SECTION ================= */
+.filter-section{
+    background:rgba(11,42,58,0.8);
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:30px;
+    border:1px solid rgba(110,243,255,0.3);
+}
+
+.filter-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+    gap:20px;
+    align-items:end;
+}
+
+.filter-item{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.filter-item label{
+    color:#6fe3ff;
+    font-weight:500;
+    font-size:0.95rem;
+}
+
+.filter-item select, 
+.filter-item input{
+    background:rgba(0,20,28,0.6);
+    border:1px solid #2c5a6e;
+    border-radius:12px;
+    padding:12px 15px;
+    color:#dffaff;
+    font-size:0.95rem;
+    outline:none;
+    transition:0.2s;
+}
+
+.filter-item select:hover,
+.filter-item input:hover{
+    border-color:#6fe3ff;
+}
+
+.filter-item select:focus,
+.filter-item input:focus{
+    border-color:#6fe3ff;
+    box-shadow:0 0 0 2px rgba(110,243,255,0.2);
+}
+
+.filter-item option{
+    background:#0b2a3a;
+    color:#dffaff;
+}
+
+.search-btn{
+    background:linear-gradient(135deg, #00f2ff, #7f5cff);
+    border:none;
+    border-radius:12px;
+    padding:12px 25px;
+    color:#020617;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.search-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:0 5px 15px rgba(0,242,255,0.3);
+}
+
+.reset-btn{
+    background:rgba(255,255,255,0.1);
+    border:2px solid #6fe3ff;
+    border-radius:12px;
+    padding:12px 25px;
+    color:#dffaff;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.2s;
+    width:100%;
+}
+
+.reset-btn:hover{
+    background:rgba(110,243,255,0.2);
+}
+
+/* ================= PENDING SUBJECTS SECTION ================= */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px dashed #2c5a6e;
+    padding-bottom: 15px;
+}
+
+.panel-header h2 {
+    color: #6fe3ff;
+    font-size: 1.8rem;
+    font-weight: 400;
+    letter-spacing: 1px;
+}
+
+.panel-badge {
+    background: rgba(255, 193, 7, 0.2);
+    border: 1px solid #ffc107;
+    color: #ffd966;
+    padding: 8px 16px;
+    border-radius: 40px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+/* ================= PROFESSORS TABLE ================= */
+.table-container{
+    overflow-x:auto;
+    border-radius:16px;
+    background:rgba(0,20,28,0.6);
+    padding:5px;
+    margin-bottom: 40px;
+}
+
+.professors-table{
+    width:100%;
+    border-collapse:collapse;
+    background:rgba(223,250,255,0.1);
+    border-radius:16px;
+    overflow:hidden;
+    min-width:1000px;
+}
+
+.professors-table th{
+    background:#0b2a3a;
+    color:#6fe3ff;
+    font-weight:600;
+    padding:15px 12px;
+    text-align:left;
+    border-bottom:3px solid #6fe3ff;
+    font-size:0.95rem;
+}
+
+.professors-table td{
+    padding:15px 12px;
+    color:#dffaff;
+    border-bottom:1px solid rgba(110,243,255,0.2);
+    font-size:0.95rem;
+}
+
+.professors-table tbody tr:hover{
+    background:rgba(110,243,255,0.1);
+    transition:0.2s;
+}
+
+/* Professor badge */
+.professor-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(110,243,255,0.15);
+    border-radius:30px;
+    padding:5px 15px 5px 5px;
+}
+
+.professor-avatar{
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    background:linear-gradient(135deg, #00f2ff, #7f5cff);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#020617;
+    font-weight:600;
+    font-size:0.9rem;
+}
+
+/* Subject tags container */
+.subject-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.subject-tag {
+    background: rgba(30, 167, 215, 0.2);
+    border: 1px solid #1ea7d7;
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 0.8rem;
+    color: #b3e4ff;
+    display: inline-block;
+}
+
+/* Status badge */
+.status-badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-active {
+    background: rgba(40, 167, 69, 0.2);
+    color: #9fdfaf;
+    border: 1px solid #28a745;
+}
+
+.status-inactive {
+    background: rgba(108, 117, 125, 0.2);
+    color: #b3b3b3;
+    border: 1px solid #6c757d;
+}
+
+/* Action buttons */
+.action-btn {
+    background: transparent;
+    border: 1px solid #6fe3ff;
+    color: #dffaff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 0.85rem;
+    margin-right: 5px;
+}
+
+.action-btn:hover {
+    background: #1ea7d7;
+    color: #00141c;
+}
+
+.action-btn.approve {
+    border-color: #28a745;
+    color: #9fdfaf;
+}
+
+.action-btn.approve:hover {
+    background: #28a745;
+    color: white;
+}
+
+.action-btn.deny {
+    border-color: #ff7b7b;
+    color: #ffb3b3;
+}
+
+.action-btn.deny:hover {
+    background: #c44a4a;
+    color: white;
+}
+
+/* Empty state */
+.empty-state{
+    text-align:center;
+    padding:60px 20px;
+    color:#9bbaca;
+}
+
+.empty-state i{
+    font-size:4rem;
+    margin-bottom:20px;
+    display:block;
+    opacity:0.5;
+}
+
+/* ================= MODAL STYLES ================= */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(5px);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: #0c2c3a;
+    border-radius: 40px;
+    padding: 30px;
+    width: 90%;
+    max-width: 500px;
+    border: 1px solid #1ea7d7;
+    box-shadow: 0 30px 40px rgba(0,0,0,0.7);
+}
+
+.modal-content h2 {
+    color: #6fe3ff;
+    margin-bottom: 20px;
+    font-weight: 400;
+}
+
+.modal-content p {
+    color: #d7f0fa;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.modal-details {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.detail-row {
+    display: flex;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #2c5a6e;
+    padding-bottom: 8px;
+}
+
+.detail-label {
+    width: 100px;
+    color: #a0d0e0;
+}
+
+.detail-value {
+    flex: 1;
+    color: #dffaff;
+    font-weight: 500;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+}
+
+/* ================= BUTTON STYLES ================= */
+.btn-primary {
+    background: #1ea7d7;
+    border: none;
+    padding: 12px 28px;
+    border-radius: 40px;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #00141c;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 8px 16px rgba(0,40,60,0.4);
+    border: 1px solid #6fe3ff;
+}
+
+.btn-primary:hover {
+    background: #6fe3ff;
+    transform: scale(1.02);
+}
+
+.btn-secondary {
+    background: transparent;
+    border: 1px solid #6fe3ff;
+    padding: 8px 16px;
+    border-radius: 30px;
+    color: #dffaff;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 500;
+}
+
+.btn-secondary:hover {
+    background: #1ea7d7;
+    color: #00141c;
+}
+
+.btn-danger {
+    background: transparent;
+    border: 1px solid #ff7b7b;
+    color: #ffb3b3;
+    padding: 8px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-danger:hover {
+    background: #c44a4a;
+    color: white;
+    border-color: #ff7b7b;
+}
+
+.btn-approve {
+    background: rgba(40, 167, 69, 0.2);
+    border: 1px solid #28a745;
+    color: #9fdfaf;
+    padding: 10px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 600;
+}
+
+.btn-approve:hover {
+    background: #28a745;
+    color: white;
+}
+
+.btn-deny {
+    background: rgba(220, 70, 70, 0.2);
+    border: 1px solid #ff7b7b;
+    color: #ffb3b3;
+    padding: 10px 24px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 600;
+}
+
+.btn-deny:hover {
+    background: #c44a4a;
+    color: white;
+}
+
+.btn-view {
+    background: transparent;
+    border: 1px solid #6fe3ff;
+    color: #dffaff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.btn-view:hover {
+    background: #1ea7d7;
+    color: #00141c;
+}
+
+/* Custom SweetAlert2 styling */
+.swal2-popup {
+    background: #0b2a3a !important;
+    border-radius: 22px !important;
+    border: 1px solid rgba(110, 243, 255, 0.25) !important;
+}
+
+.swal2-title {
+    color: #6ef3ff !important;
+}
+
+.swal2-html-container {
+    color: #dffaff !important;
+}
+
+.swal2-confirm {
+    background: linear-gradient(135deg, #00f2ff, #7f5cff) !important;
+    color: #020617 !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+}
+
+.swal2-cancel {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #dffaff !important;
+    border: 2px solid #6ef3ff !important;
+    border-radius: 12px !important;
+}
+
+#sidebarContainer {
+    position: relative;
+    z-index: 1002;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width:768px){
+    .hero{
+        padding:100px 20px 20px;
+    }
+    
+    .main-panel{
+        padding:20px;
+    }
+    
+    .header-section h1{
+        font-size:1.8rem;
+    }
+    
+    .filter-grid{
+        grid-template-columns:1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== LOAD SIDEBAR HERE ===== -->
+<div id="sidebarContainer"></div>
+
+<!-- Navbar -->
+<nav>
+    <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+    <div class="profile-wrapper">
+        <div class="profile" onclick="toggleProfileMenu()">
+            <img src="images/profile.png" id="navProfileImage">
+        </div>
+
+        <div id="profileMenu" class="profile-menu">
+            <a href="admin_profile.html">Edit Profile</a>
+            <a onclick="confirmLogout()">Logout</a>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<section class="hero">
+    <div class="main-panel">
+        
+        <!-- Header -->
+        <div class="header-section">
+            <h1>Professors Monitoring</h1>
+            <p>Manage professor subjects and approvals</p>
+        </div>
+
+        <!-- Filter Section for Pending Subjects -->
+        <div class="filter-section">
+            <div class="panel-header">
+                <h2>📋 Pending Subject Approvals</h2>
+                <span class="panel-badge" id="pendingCount">0 pending</span>
+            </div>
+            <div class="filter-grid">
+                <div class="filter-item">
+                    <label>Filter by Professor</label>
+                    <select id="professorFilter" onchange="applyFilters()">
+                        <option value="all">All Professors</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>Filter by Department</label>
+                    <select id="departmentFilter" onchange="applyFilters()">
+                        <option value="all">All Departments</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Engineering">Engineering</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label>Search Subject</label>
+                    <input type="text" id="subjectSearch" placeholder="Enter subject name..." onkeyup="applyFilters()">
+                </div>
+                <div class="filter-item">
+                    <button class="reset-btn" onclick="resetFilters()">Reset Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Subjects Table -->
+        <div class="table-container">
+            <table class="professors-table">
+                <thead>
+                    <tr>
+                        <th>Professor</th>
+                        <th>Department</th>
+                        <th>Subject</th>
+                        <th>Code</th>
+                        <th>Date Requested</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pendingSubjectsTableBody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Active Professors Section -->
+        <div class="filter-section">
+            <div class="panel-header">
+                <h2>👨‍🏫 Active Professors</h2>
+            </div>
+            <div class="filter-grid">
+                <div class="filter-item">
+                    <label>Search Professor</label>
+                    <input type="text" id="professorSearch" placeholder="Enter professor name..." onkeyup="applyProfessorFilters()">
+                </div>
+                <div class="filter-item">
+                    <label>Filter by Department</label>
+                    <select id="professorDeptFilter" onchange="applyProfessorFilters()">
+                        <option value="all">All Departments</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Physics">Physics</option>
+                        <option value="Engineering">Engineering</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <button class="reset-btn" onclick="resetProfessorFilters()">Reset Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Professors Table -->
+        <div class="table-container">
+            <table class="professors-table">
+                <thead>
+                    <tr>
+                        <th>Professor</th>
+                        <th>Department</th>
+                        <th>Email</th>
+                        <th>Subjects</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="professorsTableBody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</section>
+
+<!-- View Subject Details Modal -->
+<div id="viewSubjectModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalSubjectTitle">Subject Details</h2>
+        <div class="modal-details">
+            <div class="detail-row">
+                <span class="detail-label">Professor:</span>
+                <span class="detail-value" id="modalProfessorName">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Subject:</span>
+                <span class="detail-value" id="modalSubjectName">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Code:</span>
+                <span class="detail-value" id="modalSubjectCode">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Department:</span>
+                <span class="detail-value" id="modalDepartment">-</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Created:</span>
+                <span class="detail-value" id="modalCreatedDate">-</span>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-secondary" onclick="closeViewModal()">Close</button>
+            <button class="btn-approve" id="modalApproveBtn">Approve</button>
+            <button class="btn-deny" id="modalDenyBtn">Deny</button>
+        </div>
+    </div>
+</div>
+
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    /* ===== load sidebar component ===== */
+    fetch("admin_sidebar.html")
+    .then(r => r.text())
+    .then(html => {
+        document.getElementById("sidebarContainer").innerHTML = html;
+        // Initialize sidebar after it's loaded
+        initializeSidebar();
+    });
+
+    function initializeSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        const overlay = document.getElementById("overlay");
+        
+        if (sidebar && overlay) {
+            window.toggleMenu = function(){
+                sidebar.classList.toggle("active");
+                overlay.classList.toggle("active");
+            };
+            
+            overlay.onclick = toggleMenu;
+        }
+    }
+
+    // Logout confirmation function
+    function confirmLogout() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out of your account!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#00f2ff',
+            cancelButtonColor: '#ff6b6b',
+            confirmButtonText: 'Yes, logout',
+            cancelButtonText: 'Cancel',
+            background: '#0b2a3a',
+            color: '#dffaff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Clear all user data from localStorage
+                localStorage.clear();
+                
+                Swal.fire({
+                    title: 'Logged Out!',
+                    text: 'You have been successfully logged out.',
+                    icon: 'success',
+                    confirmButtonColor: '#00f2ff',
+                    background: '#0b2a3a',
+                    color: '#dffaff'
+                }).then(() => {
+                    // Redirect to login page
+                    window.location.href = 'login.html';
+                });
+            }
+        });
+    }
+
+    /* profile dropdown */
+    function toggleProfileMenu(){
+        const profileMenu = document.getElementById("profileMenu");
+        profileMenu.classList.toggle("active");
+    }
+
+    document.addEventListener("click", function(e){
+        const profile = document.querySelector(".profile");
+        const menu = document.getElementById("profileMenu");
+        if(!profile.contains(e.target) && !menu.contains(e.target)){
+            menu.classList.remove("active");
+        }
+    });
+
+    // ==================== PENDING SUBJECTS SYSTEM ====================
+
+    // Initialize or load pending subjects from localStorage
+    let pendingSubjects = JSON.parse(localStorage.getItem('admin_pending_subjects')) || [];
+    
+    // Sample professors data
+    const professors = [
+        { id: 'prof1', name: 'Dr. Sarah Johnson', department: 'Computer Science', email: 'sarah.j@univ.edu', avatar: 'SJ' },
+        { id: 'prof2', name: 'Prof. Michael Chen', department: 'Mathematics', email: 'm.chen@univ.edu', avatar: 'MC' },
+        { id: 'prof3', name: 'Dr. Emily Rodriguez', department: 'Physics', email: 'e.rodriguez@univ.edu', avatar: 'ER' },
+        { id: 'prof4', name: 'Prof. David Kim', department: 'Engineering', email: 'd.kim@univ.edu', avatar: 'DK' },
+    ];
+
+    // Current filters
+    let currentFilters = {
+        professor: 'all',
+        department: 'all',
+        subject: ''
+    };
+
+    let professorFilters = {
+        search: '',
+        department: 'all'
+    };
+
+    // Listen for new pending subjects from professors
+    function checkForNewPendingSubjects() {
+        // Check if there are any pending subjects in the professors' storage
+        const profSubjects = JSON.parse(localStorage.getItem('prof_subjects_pending')) || [];
+        
+        // Add new pending subjects that aren't already in our list
+        profSubjects.forEach(newSubject => {
+            const exists = pendingSubjects.some(s => s.id === newSubject.id);
+            if (!exists) {
+                // Add timestamp and default status
+                newSubject.status = 'pending';
+                newSubject.createdAt = newSubject.createdAt || new Date().toISOString();
+                newSubject.professorName = getProfessorName(newSubject.professorId);
+                newSubject.professorDept = getProfessorDepartment(newSubject.professorId);
+                pendingSubjects.push(newSubject);
+            }
+        });
+        
+        // Clear the professors' pending storage after reading
+        localStorage.removeItem('prof_subjects_pending');
+        
+        savePendingSubjects();
+        renderPendingSubjectsTable();
+        populateProfessorFilter();
+    }
+
+    function getProfessorName(professorId) {
+        const prof = professors.find(p => p.id === professorId);
+        return prof ? prof.name : 'Unknown Professor';
+    }
+
+    function getProfessorDepartment(professorId) {
+        const prof = professors.find(p => p.id === professorId);
+        return prof ? prof.department : 'General';
+    }
+
+    function getProfessorAvatar(professorId) {
+        const prof = professors.find(p => p.id === professorId);
+        return prof ? prof.avatar : 'UN';
+    }
+
+    function savePendingSubjects() {
+        localStorage.setItem('admin_pending_subjects', JSON.stringify(pendingSubjects));
+        updatePendingCount();
+    }
+
+    function updatePendingCount() {
+        const count = pendingSubjects.length;
+        document.getElementById('pendingCount').textContent = `${count} pending`;
+    }
+
+    // Populate professor filter dropdown
+    function populateProfessorFilter() {
+        const professorSelect = document.getElementById('professorFilter');
+        
+        // Clear existing options except "all"
+        professorSelect.innerHTML = '<option value="all">All Professors</option>';
+        
+        // Get unique professors from pending subjects
+        const uniqueProfessors = [];
+        pendingSubjects.forEach(subject => {
+            if (!uniqueProfessors.some(p => p.id === subject.professorId)) {
+                uniqueProfessors.push({
+                    id: subject.professorId,
+                    name: subject.professorName
+                });
+            }
+        });
+        
+        // Add professors to filter
+        uniqueProfessors.forEach(prof => {
+            const option = document.createElement('option');
+            option.value = prof.id;
+            option.textContent = prof.name;
+            professorSelect.appendChild(option);
+        });
+    }
+
+    // Apply filters to pending subjects
+    window.applyFilters = function() {
+        currentFilters = {
+            professor: document.getElementById('professorFilter').value,
+            department: document.getElementById('departmentFilter').value,
+            subject: document.getElementById('subjectSearch').value.toLowerCase()
+        };
+        
+        renderPendingSubjectsTable();
+    };
+
+    // Reset filters
+    window.resetFilters = function() {
+        document.getElementById('professorFilter').value = 'all';
+        document.getElementById('departmentFilter').value = 'all';
+        document.getElementById('subjectSearch').value = '';
+        
+        currentFilters = {
+            professor: 'all',
+            department: 'all',
+            subject: ''
+        };
+        
+        renderPendingSubjectsTable();
+    };
+
+    // Apply professor filters
+    window.applyProfessorFilters = function() {
+        professorFilters = {
+            search: document.getElementById('professorSearch').value.toLowerCase(),
+            department: document.getElementById('professorDeptFilter').value
+        };
+        
+        renderProfessorsTable();
+    };
+
+    // Reset professor filters
+    window.resetProfessorFilters = function() {
+        document.getElementById('professorSearch').value = '';
+        document.getElementById('professorDeptFilter').value = 'all';
+        
+        professorFilters = {
+            search: '',
+            department: 'all'
+        };
+        
+        renderProfessorsTable();
+    };
+
+    // Render pending subjects table
+    function renderPendingSubjectsTable() {
+        const tbody = document.getElementById('pendingSubjectsTableBody');
+        
+        // Apply filters
+        let filteredSubjects = pendingSubjects.filter(subject => {
+            // Professor filter
+            if (currentFilters.professor !== 'all' && subject.professorId !== currentFilters.professor) {
+                return false;
+            }
+            
+            // Department filter
+            if (currentFilters.department !== 'all' && subject.department !== currentFilters.department) {
+                return false;
+            }
+            
+            // Subject name filter
+            if (currentFilters.subject && !subject.name.toLowerCase().includes(currentFilters.subject)) {
+                return false;
+            }
+            
+            return true;
+        });
+        
+        // Render table
+        if (filteredSubjects.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <i>📋</i>
+                            <h3>No pending subjects</h3>
+                            <p>No subject requests match your filters</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        filteredSubjects.forEach(subject => {
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td>
+                    <div class="professor-badge">
+                        <div class="professor-avatar">${getProfessorAvatar(subject.professorId)}</div>
+                        ${subject.professorName}
+                    </div>
+                </td>
+                <td>${subject.department || 'General'}</td>
+                <td>${subject.name}</td>
+                <td>${subject.code || '—'}</td>
+                <td>${new Date(subject.createdAt).toLocaleDateString()}</td>
+                <td>
+                    <button class="btn-view" onclick="viewSubjectDetails('${subject.id}')">View</button>
+                    <button class="action-btn approve" onclick="approveSubject('${subject.id}')">✓ Approve</button>
+                    <button class="action-btn deny" onclick="denySubject('${subject.id}')">✗ Deny</button>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+    }
+
+    // Render professors table
+    function renderProfessorsTable() {
+        const tbody = document.getElementById('professorsTableBody');
+        
+        // Get approved subjects
+        const approvedSubjects = JSON.parse(localStorage.getItem('admin_approved_subjects')) || [];
+        
+        // Apply filters
+        let filteredProfessors = professors.filter(prof => {
+            // Search filter
+            if (professorFilters.search && !prof.name.toLowerCase().includes(professorFilters.search)) {
+                return false;
+            }
+            
+            // Department filter
+            if (professorFilters.department !== 'all' && prof.department !== professorFilters.department) {
+                return false;
+            }
+            
+            return true;
+        });
+        
+        // Render table
+        if (filteredProfessors.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <i>👨‍🏫</i>
+                            <h3>No professors found</h3>
+                            <p>No professors match your filters</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+        
+        tbody.innerHTML = '';
+        filteredProfessors.forEach(prof => {
+            const profSubjects = approvedSubjects.filter(s => s.professorId === prof.id);
+            
+            const row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td>
+                    <div class="professor-badge">
+                        <div class="professor-avatar">${prof.avatar}</div>
+                        ${prof.name}
+                    </div>
+                </td>
+                <td>${prof.department}</td>
+                <td>${prof.email}</td>
+                <td>
+                    <div class="subject-tags">
+                        ${profSubjects.length > 0 ? 
+                            profSubjects.map(s => `<span class="subject-tag">${s.name}</span>`).join('') : 
+                            '<span style="color: #799eb0;">No subjects</span>'}
+                    </div>
+                </td>
+                <td>
+                    <span class="status-badge status-active">Active</span>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
+        });
+    }
+
+    function viewSubjectDetails(subjectId) {
+        const subject = pendingSubjects.find(s => s.id === subjectId);
+        if (!subject) return;
+
+        document.getElementById('modalSubjectTitle').textContent = 'Subject Details';
+        document.getElementById('modalProfessorName').textContent = subject.professorName;
+        document.getElementById('modalSubjectName').textContent = subject.name;
+        document.getElementById('modalSubjectCode').textContent = subject.code || 'N/A';
+        document.getElementById('modalDepartment').textContent = subject.department || 'General';
+        document.getElementById('modalCreatedDate').textContent = new Date(subject.createdAt).toLocaleString();
+
+        // Set up approve/deny buttons for modal
+        document.getElementById('modalApproveBtn').onclick = () => {
+            closeViewModal();
+            approveSubject(subjectId);
+        };
+        document.getElementById('modalDenyBtn').onclick = () => {
+            closeViewModal();
+            denySubject(subjectId);
+        };
+
+        document.getElementById('viewSubjectModal').classList.add('active');
+    }
+
+    function closeViewModal() {
+        document.getElementById('viewSubjectModal').classList.remove('active');
+    }
+
+    // Approve subject function
+    function approveSubject(subjectId) {
+        const subjectIndex = pendingSubjects.findIndex(s => s.id === subjectId);
+        if (subjectIndex === -1) return;
+
+        const subject = pendingSubjects[subjectIndex];
+        
+        Swal.fire({
+            title: 'Approve Subject?',
+            text: `Are you sure you want to approve "${subject.name}"?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#ff6b6b',
+            confirmButtonText: 'Yes, approve',
+            cancelButtonText: 'Cancel',
+            background: '#0b2a3a',
+            color: '#dffaff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Move to approved subjects
+                const approvedSubjects = JSON.parse(localStorage.getItem('admin_approved_subjects')) || [];
+                subject.status = 'approved';
+                subject.approvedAt = new Date().toISOString();
+                approvedSubjects.push(subject);
+                localStorage.setItem('admin_approved_subjects', JSON.stringify(approvedSubjects));
+
+                // Save to professors' approved list for notification
+                const profApprovedSubjects = JSON.parse(localStorage.getItem('prof_approved_subjects')) || [];
+                profApprovedSubjects.push(subject);
+                localStorage.setItem('prof_approved_subjects', JSON.stringify(profApprovedSubjects));
+
+                // Remove from pending
+                pendingSubjects.splice(subjectIndex, 1);
+                savePendingSubjects();
+                renderPendingSubjectsTable();
+                renderProfessorsTable();
+
+                Swal.fire({
+                    title: 'Approved!',
+                    text: 'Subject has been approved successfully. The professor will be notified.',
+                    icon: 'success',
+                    confirmButtonColor: '#00f2ff',
+                    background: '#0b2a3a',
+                    color: '#dffaff',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        });
+    }
+
+    // Deny subject function
+    function denySubject(subjectId) {
+        const subjectIndex = pendingSubjects.findIndex(s => s.id === subjectId);
+        if (subjectIndex === -1) return;
+
+        const subject = pendingSubjects[subjectIndex];
+
+        Swal.fire({
+            title: 'Deny Subject?',
+            text: `Are you sure you want to deny "${subject.name}"?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#c44a4a',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, deny',
+            cancelButtonText: 'Cancel',
+            background: '#0b2a3a',
+            color: '#dffaff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Save to denied subjects for history and professor notification
+                const deniedSubjects = JSON.parse(localStorage.getItem('admin_denied_subjects')) || [];
+                subject.status = 'denied';
+                subject.deniedAt = new Date().toISOString();
+                deniedSubjects.push(subject);
+                localStorage.setItem('admin_denied_subjects', JSON.stringify(deniedSubjects));
+
+                // Also save to professors' denied list for notification
+                const profDeniedSubjects = JSON.parse(localStorage.getItem('prof_denied_subjects')) || [];
+                profDeniedSubjects.push(subject);
+                localStorage.setItem('prof_denied_subjects', JSON.stringify(profDeniedSubjects));
+
+                // Remove from pending
+                pendingSubjects.splice(subjectIndex, 1);
+                savePendingSubjects();
+                renderPendingSubjectsTable();
+
+                Swal.fire({
+                    title: 'Denied!',
+                    text: 'Subject has been denied. The professor will be notified.',
+                    icon: 'info',
+                    confirmButtonColor: '#00f2ff',
+                    background: '#0b2a3a',
+                    color: '#dffaff',
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        });
+    }
+
+    // Check for new pending subjects every 3 seconds
+    setInterval(checkForNewPendingSubjects, 3000);
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load profile data
+        const savedImage = localStorage.getItem('profileImage');
+        if (savedImage) {
+            document.getElementById('navProfileImage').src = savedImage;
+        }
+
+        // Initialize pending subjects and professors list
+        checkForNewPendingSubjects();
+        renderPendingSubjectsTable();
+        renderProfessorsTable();
+        updatePendingCount();
+    });
+
+    // Listen for storage changes to update in real-time
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'profileImage') {
+            document.getElementById('navProfileImage').src = e.newValue;
+        }
+        if (e.key === 'prof_subjects_pending') {
+            // New pending subject detected
+            checkForNewPendingSubjects();
+        }
+    });
+
+    // Expose functions globally
+    window.viewSubjectDetails = viewSubjectDetails;
+    window.closeViewModal = closeViewModal;
+    window.approveSubject = approveSubject;
+    window.denySubject = denySubject;
+</script>
+
+</body>
+</html>
