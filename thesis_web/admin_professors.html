@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin Professors Monitoring | ADV-Attendify</title>
 
+<!-- Favicon - Multiple formats for better compatibility -->
+<link rel="icon" type="image/png" sizes="32x32" href="images/websitelogo.png">
+<link rel="icon" type="image/png" sizes="16x16" href="images/websitelogo.png">
+<link rel="shortcut icon" href="images/websitelogo.png" type="image/x-icon">
+
 <!-- SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
@@ -1093,12 +1098,14 @@ nav{
         });
     }
 
-    // Render professors table
+    // ========== FIXED: Render professors table with subjects from teacher's page ==========
     function renderProfessorsTable() {
         const tbody = document.getElementById('professorsTableBody');
         
-        // Get approved subjects
-        const approvedSubjects = JSON.parse(localStorage.getItem('admin_approved_subjects')) || [];
+        // Get all subjects from professors' storage (this is the teacher's subject records)
+        const allProfessorSubjects = JSON.parse(localStorage.getItem('prof_subjects')) || [];
+        
+        console.log('All professor subjects:', allProfessorSubjects); // Debug log
         
         // Apply filters
         let filteredProfessors = professors.filter(prof => {
@@ -1133,7 +1140,12 @@ nav{
         
         tbody.innerHTML = '';
         filteredProfessors.forEach(prof => {
-            const profSubjects = approvedSubjects.filter(s => s.professorId === prof.id);
+            // Get subjects for this professor from their subject records
+            const profSubjects = allProfessorSubjects.filter(s => {
+                return s.professorId === prof.id;
+            });
+            
+            console.log(`Subjects for ${prof.name}:`, profSubjects); // Debug log
             
             const row = document.createElement('tr');
             
@@ -1190,7 +1202,7 @@ nav{
         document.getElementById('viewSubjectModal').classList.remove('active');
     }
 
-    // Approve subject function
+    // ========== FIXED: Approve subject function - adds to teacher's subject records ==========
     function approveSubject(subjectId) {
         const subjectIndex = pendingSubjects.findIndex(s => s.id === subjectId);
         if (subjectIndex === -1) return;
@@ -1210,27 +1222,57 @@ nav{
             color: '#dffaff'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Move to approved subjects
-                const approvedSubjects = JSON.parse(localStorage.getItem('admin_approved_subjects')) || [];
-                subject.status = 'approved';
-                subject.approvedAt = new Date().toISOString();
-                approvedSubjects.push(subject);
-                localStorage.setItem('admin_approved_subjects', JSON.stringify(approvedSubjects));
+                // Get current professor's subjects (their subject records)
+                const profSubjects = JSON.parse(localStorage.getItem('prof_subjects')) || [];
+                
+                // Check if subject already exists
+                const existingSubject = profSubjects.find(s => s.id === subject.id);
+                
+                if (!existingSubject) {
+                    // Create subject for professor's subject records with proper structure
+                    const professorSubject = {
+                        id: subject.id,
+                        name: subject.name,
+                        code: subject.code || 'No Code',
+                        professorId: subject.professorId,
+                        students: [] // Initialize empty students array for enrollment
+                    };
+                    
+                    profSubjects.push(professorSubject);
+                    localStorage.setItem('prof_subjects', JSON.stringify(profSubjects));
+                    
+                    console.log('Added subject to teacher records:', professorSubject); // Debug log
+                }
 
                 // Save to professors' approved list for notification
                 const profApprovedSubjects = JSON.parse(localStorage.getItem('prof_approved_subjects')) || [];
-                profApprovedSubjects.push(subject);
+                
+                const notificationSubject = {
+                    id: subject.id,
+                    name: subject.name,
+                    code: subject.code,
+                    professorId: subject.professorId,
+                    approvedAt: new Date().toISOString()
+                };
+                
+                profApprovedSubjects.push(notificationSubject);
                 localStorage.setItem('prof_approved_subjects', JSON.stringify(profApprovedSubjects));
 
                 // Remove from pending
                 pendingSubjects.splice(subjectIndex, 1);
                 savePendingSubjects();
+                
+                // Re-render tables
                 renderPendingSubjectsTable();
-                renderProfessorsTable();
+                renderProfessorsTable(); // This will now show the subject in professor's list
+                populateProfessorFilter();
+
+                // Force a storage event to notify teacher's page
+                window.dispatchEvent(new Event('storage'));
 
                 Swal.fire({
                     title: 'Approved!',
-                    text: 'Subject has been approved successfully. The professor will be notified.',
+                    text: 'Subject has been approved and added to professor\'s subject records.',
                     icon: 'success',
                     confirmButtonColor: '#00f2ff',
                     background: '#0b2a3a',
@@ -1238,6 +1280,13 @@ nav{
                     timer: 3000,
                     timerProgressBar: true
                 });
+                
+                // Clean up notification after 10 seconds
+                setTimeout(() => {
+                    const currentApproved = JSON.parse(localStorage.getItem('prof_approved_subjects')) || [];
+                    const updatedApproved = currentApproved.filter(s => s.id !== subject.id);
+                    localStorage.setItem('prof_approved_subjects', JSON.stringify(updatedApproved));
+                }, 10000);
             }
         });
     }
@@ -1262,26 +1311,33 @@ nav{
             color: '#dffaff'
         }).then((result) => {
             if (result.isConfirmed) {
-                // Save to denied subjects for history and professor notification
-                const deniedSubjects = JSON.parse(localStorage.getItem('admin_denied_subjects')) || [];
-                subject.status = 'denied';
-                subject.deniedAt = new Date().toISOString();
-                deniedSubjects.push(subject);
-                localStorage.setItem('admin_denied_subjects', JSON.stringify(deniedSubjects));
-
-                // Also save to professors' denied list for notification
+                // Save to professors' denied list for notification
                 const profDeniedSubjects = JSON.parse(localStorage.getItem('prof_denied_subjects')) || [];
-                profDeniedSubjects.push(subject);
+                
+                const notificationSubject = {
+                    id: subject.id,
+                    name: subject.name,
+                    professorId: subject.professorId,
+                    deniedAt: new Date().toISOString()
+                };
+                
+                profDeniedSubjects.push(notificationSubject);
                 localStorage.setItem('prof_denied_subjects', JSON.stringify(profDeniedSubjects));
 
                 // Remove from pending
                 pendingSubjects.splice(subjectIndex, 1);
                 savePendingSubjects();
+                
+                // Re-render tables
                 renderPendingSubjectsTable();
+                renderProfessorsTable();
+                
+                // Update the professor filter dropdown
+                populateProfessorFilter();
 
                 Swal.fire({
                     title: 'Denied!',
-                    text: 'Subject has been denied. The professor will be notified.',
+                    text: 'Subject has been denied.',
                     icon: 'info',
                     confirmButtonColor: '#00f2ff',
                     background: '#0b2a3a',
@@ -1289,6 +1345,13 @@ nav{
                     timer: 3000,
                     timerProgressBar: true
                 });
+                
+                // Clean up notification after 10 seconds
+                setTimeout(() => {
+                    const currentDenied = JSON.parse(localStorage.getItem('prof_denied_subjects')) || [];
+                    const updatedDenied = currentDenied.filter(s => s.id !== subject.id);
+                    localStorage.setItem('prof_denied_subjects', JSON.stringify(updatedDenied));
+                }, 10000);
             }
         });
     }
@@ -1319,6 +1382,11 @@ nav{
         if (e.key === 'prof_subjects_pending') {
             // New pending subject detected
             checkForNewPendingSubjects();
+        }
+        if (e.key === 'prof_subjects') {
+            // Subjects list changed (teacher added, approved, or deleted)
+            console.log('prof_subjects changed, updating professors table');
+            renderProfessorsTable();
         }
     });
 
