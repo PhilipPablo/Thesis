@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Professor Subjects | ADV-Attendify</title>
+
+    <!-- Favicon - Multiple formats for better compatibility -->
+    <link rel="icon" type="image/png" sizes="32x32" href="images/websitelogo.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/websitelogo.png">
+    <link rel="shortcut icon" href="images/websitelogo.png" type="image/x-icon">
+
     <!-- SweetAlert2 CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
@@ -761,9 +767,9 @@
     let subjects = JSON.parse(localStorage.getItem('prof_subjects')) || (() => {
         // Create subjects with random student enrollments
         const subjects = [
-            { id: 's1', name: 'Advanced Mathematics', code: 'MAT401', students: [] },
-            { id: 's2', name: 'Data Structures', code: 'CSE202', students: [] },
-            { id: 's3', name: 'Digital Electronics', code: 'ECE310', students: [] },
+            { id: 's1', name: 'Advanced Mathematics', code: 'MAT401', students: [], professorId: 'prof1' },
+            { id: 's2', name: 'Data Structures', code: 'CSE202', students: [], professorId: 'prof2' },
+            { id: 's3', name: 'Digital Electronics', code: 'ECE310', students: [], professorId: 'prof3' },
         ];
         
         // Add random students to each subject for testing
@@ -784,6 +790,8 @@
 
     function persistSubjects() {
         localStorage.setItem('prof_subjects', JSON.stringify(subjects));
+        // Trigger storage event for admin page to update
+        window.dispatchEvent(new Event('storage'));
     }
 
     // Render subject cards with X delete button
@@ -821,10 +829,12 @@
         });
     }
 
-    // Delete subject
+    // ========== FIXED: Delete subject function ==========
     function deleteSubject(subjectId) {
+        const subject = subjects.find(s => s.id === subjectId);
+        
         subjects = subjects.filter(s => s.id !== subjectId);
-        persistSubjects();
+        persistSubjects(); // This will save and trigger storage event
         
         if (currentSubjectId === subjectId) {
             document.getElementById('subjectDetailPanel').style.display = 'none';
@@ -833,6 +843,20 @@
         
         renderSubjectCards();
         closeDeleteModal();
+        
+        // Show deletion message
+        if (subject) {
+            Swal.fire({
+                title: 'Subject Deleted',
+                text: `"${subject.name}" has been removed from your list.`,
+                icon: 'info',
+                background: '#0b2a3a',
+                color: '#dffaff',
+                confirmButtonColor: '#00f2ff',
+                timer: 2000,
+                timerProgressBar: true
+            });
+        }
     }
 
     // Delete modal functions
@@ -1111,10 +1135,13 @@
         return departments[professorId] || 'General';
     }
 
-    // Add function to check for approval/denial updates
+    // ========== FIXED: Check for approval/denial updates ==========
     function checkSubjectStatus() {
         const approvedSubjects = JSON.parse(localStorage.getItem('prof_approved_subjects')) || [];
         const deniedSubjects = JSON.parse(localStorage.getItem('prof_denied_subjects')) || [];
+        
+        console.log('Checking status - Approved:', approvedSubjects); // Debug log
+        console.log('Checking status - Denied:', deniedSubjects); // Debug log
         
         // Check for newly approved subjects
         const lastCheckedApproved = localStorage.getItem('lastCheckedApproved') || '0';
@@ -1132,13 +1159,21 @@
                 timerProgressBar: true
             });
             
-            // Add to professor's subjects list
-            subjects.push({
-                id: subject.id,
-                name: subject.name,
-                code: subject.code,
-                students: []
-            });
+            // Check if subject already exists
+            const existingSubject = subjects.find(s => s.id === subject.id);
+            
+            if (!existingSubject) {
+                // Add to professor's subjects list
+                subjects.push({
+                    id: subject.id,
+                    name: subject.name,
+                    code: subject.code || 'No Code',
+                    professorId: subject.professorId,
+                    students: []
+                });
+                
+                console.log('Added new subject to records:', subject.name); // Debug log
+            }
         });
         
         // Check for newly denied subjects
@@ -1160,8 +1195,10 @@
         
         if (newApproved.length > 0) {
             localStorage.setItem('lastCheckedApproved', new Date().toISOString());
-            persistSubjects();
+            persistSubjects(); // This will save and trigger storage event
             renderSubjectCards();
+            
+            console.log('Updated subjects list:', subjects); // Debug log
         }
         
         if (newDenied.length > 0) {
@@ -1183,6 +1220,9 @@
     document.addEventListener('DOMContentLoaded', () => {
         renderSubjectCards();
         checkSubjectStatus(); // Check for any updates on page load
+        
+        // Also check immediately with a slight delay
+        setTimeout(checkSubjectStatus, 1000);
 
         document.getElementById('createSubjectBtn').addEventListener('click', openCreateModal);
         
@@ -1230,6 +1270,7 @@
 
     // Add event listener for storage changes (to detect admin actions)
     window.addEventListener('storage', function(e) {
+        console.log('Storage event detected:', e.key); // Debug log
         if (e.key === 'prof_approved_subjects' || e.key === 'prof_denied_subjects') {
             checkSubjectStatus();
         }
