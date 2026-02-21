@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Professor Subjects | ADV-Attendify</title>
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <style>
         * {
             margin: 0;
@@ -672,6 +674,9 @@
     </div>
 </div>
 
+<!-- SweetAlert2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     // ---------- PROFILE MENU ----------
     function toggleProfileMenu() {
@@ -1027,30 +1032,157 @@
         document.getElementById('createSubjectModal').classList.remove('active');
     }
 
+    // ========== NEW CODE FOR ADMIN APPROVAL SYSTEM ==========
+    
+    // Modified saveNewSubject function to send to admin for approval
     function saveNewSubject() {
         const name = document.getElementById('subjectNameInput').value.trim();
         const code = document.getElementById('subjectCodeInput').value.trim();
         if (!name) {
-            alert('Subject name is required');
+            Swal.fire({
+                title: 'Error',
+                text: 'Subject name is required',
+                icon: 'error',
+                background: '#0b2a3a',
+                color: '#dffaff',
+                confirmButtonColor: '#00f2ff'
+            });
             return;
         }
+        
+        // Get current professor info (you might want to store this in localStorage when professor logs in)
+        const professorId = localStorage.getItem('professorId') || 'prof1'; // Default to first professor for demo
+        const professorName = getProfessorName(professorId);
+        
         const newId = 'subj_' + Date.now() + Math.random().toString(36).substr(2, 5);
         const newSubject = {
             id: newId,
             name: name,
-            code: code || '---',
-            students: []
+            code: code || 'No code',
+            professorId: professorId,
+            professorName: professorName,
+            department: getProfessorDepartment(professorId),
+            status: 'pending',
+            createdAt: new Date().toISOString()
         };
-        subjects.push(newSubject);
-        persistSubjects();
-        renderSubjectCards();
+        
+        // Get existing pending subjects or initialize array
+        let pendingSubjects = JSON.parse(localStorage.getItem('prof_subjects_pending')) || [];
+        pendingSubjects.push(newSubject);
+        localStorage.setItem('prof_subjects_pending', JSON.stringify(pendingSubjects));
+        
+        // Show success message
+        Swal.fire({
+            title: 'Subject Submitted!',
+            text: 'Your subject has been sent to admin for approval. You will be notified once it\'s approved or denied.',
+            icon: 'success',
+            background: '#0b2a3a',
+            color: '#dffaff',
+            confirmButtonColor: '#00f2ff',
+            timer: 3000,
+            timerProgressBar: true
+        });
+        
         closeCreateModal();
-        openSubjectDetail(newId);
+        
+        // Trigger storage event for admin page to update
+        window.dispatchEvent(new Event('storage'));
     }
+
+    // Helper function to get professor name
+    function getProfessorName(professorId) {
+        const professors = {
+            'prof1': 'Dr. Sarah Johnson',
+            'prof2': 'Prof. Michael Chen',
+            'prof3': 'Dr. Emily Rodriguez',
+            'prof4': 'Prof. David Kim'
+        };
+        return professors[professorId] || 'Unknown Professor';
+    }
+
+    // Helper function to get professor department
+    function getProfessorDepartment(professorId) {
+        const departments = {
+            'prof1': 'Computer Science',
+            'prof2': 'Mathematics',
+            'prof3': 'Physics',
+            'prof4': 'Engineering'
+        };
+        return departments[professorId] || 'General';
+    }
+
+    // Add function to check for approval/denial updates
+    function checkSubjectStatus() {
+        const approvedSubjects = JSON.parse(localStorage.getItem('prof_approved_subjects')) || [];
+        const deniedSubjects = JSON.parse(localStorage.getItem('prof_denied_subjects')) || [];
+        
+        // Check for newly approved subjects
+        const lastCheckedApproved = localStorage.getItem('lastCheckedApproved') || '0';
+        const newApproved = approvedSubjects.filter(s => s.createdAt > lastCheckedApproved);
+        
+        newApproved.forEach(subject => {
+            Swal.fire({
+                title: 'Subject Approved!',
+                text: `Your subject "${subject.name}" has been approved by the admin.`,
+                icon: 'success',
+                background: '#0b2a3a',
+                color: '#dffaff',
+                confirmButtonColor: '#00f2ff',
+                timer: 5000,
+                timerProgressBar: true
+            });
+            
+            // Add to professor's subjects list
+            subjects.push({
+                id: subject.id,
+                name: subject.name,
+                code: subject.code,
+                students: []
+            });
+        });
+        
+        // Check for newly denied subjects
+        const lastCheckedDenied = localStorage.getItem('lastCheckedDenied') || '0';
+        const newDenied = deniedSubjects.filter(s => s.createdAt > lastCheckedDenied);
+        
+        newDenied.forEach(subject => {
+            Swal.fire({
+                title: 'Subject Denied',
+                text: `Your subject "${subject.name}" has been denied by the admin.`,
+                icon: 'info',
+                background: '#0b2a3a',
+                color: '#dffaff',
+                confirmButtonColor: '#00f2ff',
+                timer: 5000,
+                timerProgressBar: true
+            });
+        });
+        
+        if (newApproved.length > 0) {
+            localStorage.setItem('lastCheckedApproved', new Date().toISOString());
+            persistSubjects();
+            renderSubjectCards();
+        }
+        
+        if (newDenied.length > 0) {
+            localStorage.setItem('lastCheckedDenied', new Date().toISOString());
+        }
+        
+        // Clean up processed items
+        if (newApproved.length > 0 || newDenied.length > 0) {
+            const remainingApproved = approvedSubjects.filter(s => s.createdAt <= lastCheckedApproved);
+            const remainingDenied = deniedSubjects.filter(s => s.createdAt <= lastCheckedDenied);
+            localStorage.setItem('prof_approved_subjects', JSON.stringify(remainingApproved));
+            localStorage.setItem('prof_denied_subjects', JSON.stringify(remainingDenied));
+        }
+    }
+
+    // ========== END OF NEW CODE ==========
 
     // Event listeners
     document.addEventListener('DOMContentLoaded', () => {
         renderSubjectCards();
+        checkSubjectStatus(); // Check for any updates on page load
 
         document.getElementById('createSubjectBtn').addEventListener('click', openCreateModal);
         
@@ -1095,6 +1227,16 @@
             profileMenu?.classList.remove('active');
         }
     });
+
+    // Add event listener for storage changes (to detect admin actions)
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'prof_approved_subjects' || e.key === 'prof_denied_subjects') {
+            checkSubjectStatus();
+        }
+    });
+
+    // Check for updates every 10 seconds
+    setInterval(checkSubjectStatus, 10000);
 
     // Expose functions globally
     window.closeCreateModal = closeCreateModal;
